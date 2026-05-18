@@ -1,136 +1,219 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>QA Practice</title>
+    <meta charset="UTF-8">
+    <title>Total Onion — QA Practice</title>
     <style>
+        :root {
+            --bg: #1a1a2e;
+            --panel: #0f0f1e;
+            --accent: #4ade80;
+            --muted: #9ca3af;
+            --error: #ef4444;
+        }
         body {
-            background-color: #1a1a2e;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 40px;
             margin: 0;
+            padding: 40px;
+            background: var(--bg);
+            color: white;
+            font: 16px/1.5 Arial, sans-serif;
         }
-        h1 {
-            color: #4ade80;
-        }
-        a {
-            color: #4ade80;
-        }
-        #age-gate {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        h1 { color: var(--accent); }
+        a  { color: var(--accent); }
+
+        /* Age gate */
+        .gate {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.95);
+            display: grid; place-items: center;
             z-index: 9999;
         }
-        .age-gate-box {
-            background-color: #1a1a2e;
-            border: 2px solid #4ade80;
+        .gate__box {
+            border: 2px solid var(--accent);
             padding: 40px;
+            max-width: 380px;
             text-align: center;
-            max-width: 400px;
         }
-        .age-gate-box h2 {
-            color: #4ade80;
-            margin-top: 0;
+        .gate__inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+        .gate__inputs input {
+            width: 60px; padding: 8px;
+            font-size: 18px; text-align: center;
+            background: var(--panel); color: white;
+            border: 1px solid var(--accent); border-radius: 4px;
         }
-        .dob-inputs {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 20px 0;
+        .gate__inputs input.yr { width: 90px; }
+        .gate__btn {
+            padding: 10px 30px; font-size: 16px;
+            background: var(--accent); color: black;
+            border: none; border-radius: 4px; cursor: pointer;
         }
-        .dob-inputs input {
-            width: 60px;
-            font-size: 18px;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #4ade80;
-            background-color: #0f0f1e;
-            color: white;
-            border-radius: 4px;
+        .gate__error { color: var(--error); min-height: 1.2em; margin-top: 10px; }
+
+        /* Cookie banner */
+        .cookies {
+            position: fixed;
+            bottom: 20px; left: 20px; right: 20px;
+            max-width: 700px; margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,.5);
         }
-        .dob-inputs input.year {
-            width: 90px;
+        .cookies__title { color: var(--accent); margin: 0 0 8px; font-size: 18px; }
+        .cookies__text  { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+        .cookies__row   { display: flex; gap: 10px; flex-wrap: wrap; }
+        .cookies__btn {
+            padding: 8px 20px; font-size: 14px;
+            border: none; border-radius: 4px; cursor: pointer;
         }
-        .age-gate-box button {
-            font-size: 16px;
-            padding: 10px 30px;
-            margin-top: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            background-color: #4ade80;
-            color: black;
+        .cookies__btn--accept { background: var(--accent); color: black; }
+        .cookies__btn--reject { background: transparent; color: white; border: 1px solid var(--muted); }
+        .cookies__btn--custom { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+
+        /* Customise panel */
+        .cookies__panel { margin-top: 16px; display: none; }
+        .cookies__panel.is-open { display: block; }
+        .cookies__option {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-top: 1px solid #333;
         }
-        #error-msg {
-            color: #ef4444;
-            min-height: 20px;
-            margin-top: 10px;
-        }
+        .cookies__option small { display: block; color: var(--muted); }
+        .cookies__option input[type="checkbox"] { transform: scale(1.4); }
     </style>
 </head>
 <body>
 
-    <div id="age-gate">
-        <div class="age-gate-box">
-            <h2>Age Verification</h2>
-            <p>Please enter your date of birth.</p>
-            <div class="dob-inputs">
-                <input type="text" id="day" maxlength="2" placeholder="DD">
-                <input type="text" id="month" maxlength="2" placeholder="MM">
-                <input type="text" id="year" maxlength="4" class="year" placeholder="YYYY">
+<!-- Age gate -->
+<div class="gate" id="gate">
+    <div class="gate__box">
+        <h2>Are you old enough?</h2>
+        <p>You'll need to be 18 or over to peel back the layers.</p>
+        <div class="gate__inputs">
+            <input id="dd" maxlength="2" placeholder="DD" inputmode="numeric">
+            <input id="mm" maxlength="2" placeholder="MM" inputmode="numeric">
+            <input id="yyyy" maxlength="4" class="yr" placeholder="YYYY" inputmode="numeric">
+        </div>
+        <button class="gate__btn" onclick="verifyAge()">Let me in</button>
+        <p class="gate__error" id="err"></p>
+    </div>
+</div>
+
+<!-- Page content -->
+<h1>Hello QA Universe</h1>
+<p>This is my QA test page.</p>
+<p><a href="about.html">Go to About page</a></p>
+<p><a href="#" onclick="resetCookies(); return false;">Reset cookie choice (for QA testing)</a></p>
+
+<!-- Cookie banner -->
+<div class="cookies" id="cookies" style="display:none">
+    <h3 class="cookies__title">We use cookies</h3>
+    <p class="cookies__text">
+        Total Onion uses cookies to make this site work and to understand how you use it.
+        You're in charge — pick what you're happy with.
+    </p>
+    <div class="cookies__row">
+        <button class="cookies__btn cookies__btn--accept" onclick="acceptAll()">Accept all</button>
+        <button class="cookies__btn cookies__btn--reject" onclick="rejectAll()">Reject all</button>
+        <button class="cookies__btn cookies__btn--custom" onclick="togglePanel()">Customise</button>
+    </div>
+    <div class="cookies__panel" id="cookiePanel">
+        <div class="cookies__option">
+            <div>
+                Essential
+                <small>Needed for the site to work. Can't be turned off.</small>
             </div>
-            <button onclick="checkAge()">Enter site</button>
-            <p id="error-msg"></p>
+            <input type="checkbox" checked disabled>
+        </div>
+        <div class="cookies__option">
+            <div>
+                Analytics
+                <small>Anonymous data about how you use the site.</small>
+            </div>
+            <input type="checkbox" id="opt-analytics">
+        </div>
+        <div class="cookies__option">
+            <div>
+                Marketing
+                <small>Used to show you relevant ads on other sites.</small>
+            </div>
+            <input type="checkbox" id="opt-marketing">
+        </div>
+        <div class="cookies__row" style="margin-top: 12px;">
+            <button class="cookies__btn cookies__btn--accept" onclick="saveCustom()">Save my choices</button>
         </div>
     </div>
+</div>
 
-    <h1>Hello QA Universe</h1>
-    <p>This is my QA test page.</p>
-    <p><a href="about.html">Go to About page</a></p>
+<script>
+/* --- Age gate (from before) --- */
+function verifyAge() {
+    const dd = +document.getElementById('dd').value;
+    const mm = +document.getElementById('mm').value;
+    const yyyy = +document.getElementById('yyyy').value;
+    const err = document.getElementById('err');
+    err.textContent = '';
 
-    <script>
-        function checkAge() {
-            const day = parseInt(document.getElementById('day').value);
-            const month = parseInt(document.getElementById('month').value);
-            const year = parseInt(document.getElementById('year').value);
-            const errorMsg = document.getElementById('error-msg');
+    if (!dd || !mm || !yyyy) return err.textContent = 'Fill in all three fields.';
+    if (dd > 31 || mm > 12 || yyyy < 1900 || yyyy > new Date().getFullYear()) {
+        return err.textContent = "That date doesn't look right.";
+    }
 
-            // Validation: all fields filled
-            if (!day || !month || !year) {
-                errorMsg.textContent = 'Please fill in all fields.';
-                return;
-            }
+    const today = new Date();
+    let age = today.getFullYear() - yyyy;
+    const beforeBirthday = (today.getMonth() + 1 < mm) ||
+                           (today.getMonth() + 1 === mm && today.getDate() < dd);
+    if (beforeBirthday) age--;
 
-            // Validation: sensible ranges
-            if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > new Date().getFullYear()) {
-                errorMsg.textContent = 'Please enter a valid date.';
-                return;
-            }
+    if (age >= 18) {
+        document.getElementById('gate').remove();
+        showCookiesIfNeeded();
+    } else {
+        document.body.innerHTML = '<h1 style="text-align:center;margin-top:100px">Come back when you\'re older.</h1>';
+    }
+}
 
-            // Calculate age
-            const dob = new Date(year, month - 1, day);
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
+/* --- Cookies --- */
+function showCookiesIfNeeded() {
+    if (!localStorage.getItem('cookieChoice')) {
+        document.getElementById('cookies').style.display = 'block';
+    }
+}
 
-            // Check 18+
-            if (age >= 18) {
-                document.getElementById('age-gate').style.display = 'none';
-            } else {
-                document.body.innerHTML = '<h1 style="color: white; text-align: center; margin-top: 100px;">Sorry, you must be 18 or older to view this site.</h1>';
-            }
-        }
-    </script>
+function acceptAll() {
+    localStorage.setItem('cookieChoice', JSON.stringify({ analytics: true, marketing: true }));
+    hideBanner();
+}
+
+function rejectAll() {
+    localStorage.setItem('cookieChoice', JSON.stringify({ analytics: false, marketing: false }));
+    hideBanner();
+}
+
+function togglePanel() {
+    document.getElementById('cookiePanel').classList.toggle('is-open');
+}
+
+function saveCustom() {
+    const choice = {
+        analytics: document.getElementById('opt-analytics').checked,
+        marketing: document.getElementById('opt-marketing').checked
+    };
+    localStorage.setItem('cookieChoice', JSON.stringify(choice));
+    hideBanner();
+}
+
+function hideBanner() {
+    document.getElementById('cookies').style.display = 'none';
+}
+
+function resetCookies() {
+    localStorage.removeItem('cookieChoice');
+    document.getElementById('cookies').style.display = 'block';
+    document.getElementById('cookiePanel').classList.remove('is-open');
+}
+</script>
 
 </body>
 </html>
