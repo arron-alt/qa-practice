@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Our Services — digital products and services built end to end by Total Onion: web design, development, e-commerce, UX/UI, branding, SEO and more.">
+    <title>Our Services — Total Onion</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --ink: #111111;
+            --accent: #000000;
+            --muted: #666666;
+            --line: #e2e2e2;
+        }
+        body { margin:0; padding:96px 48px 48px; background:var(--bg); color:var(--ink); font:16px/1.6 "Helvetica Neue", Arial, sans-serif; }
+        h1 { color:var(--accent); font-size:40px; font-weight:800; letter-spacing:-0.5px; margin:0 0 8px; }
+        a { color:var(--accent); text-decoration:underline; }
+
+        /* Logo + burger menu (shared with home) */
+        .site-logo { position: fixed; top: 20px; left: 20px; width: 50px; height: auto; z-index: 10000; }
+        .menu-btn { position: fixed; top: 25px; right: 20px; z-index: 200; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 30px; line-height: 1; padding: 0; background: none; border: none; color: #000; cursor: pointer; transition: transform .25s ease; }
+        .menu-btn.is-open { transform: rotate(90deg); }
+        .menu {
+            position: fixed; top: 60px; right: 20px; z-index: 200; min-width: 230px;
+            background: #fff; border: 1px solid var(--accent); padding: 12px 18px;
+            opacity: 0; visibility: hidden; transform: translateY(-8px);
+            transition: opacity .25s ease, transform .25s ease, visibility .25s;
+        }
+        .menu.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+        .menu a { display: block; padding: 8px 0; }
+
+        .label {
+            display:flex; align-items:center; gap:14px;
+            text-transform:uppercase; letter-spacing:2px; font-size:12px; color:var(--muted);
+            margin: 28px 0 18px;
+        }
+        .label::before, .label::after { content:""; height:1px; background:var(--line); flex:1; }
+
+        .search-row { display:flex; gap:12px; align-items:center; margin:20px 0; flex-wrap:wrap; }
+        #search {
+            flex:1; min-width:220px; max-width:420px;
+            padding:12px 14px; font-size:16px;
+            background:#fff; color:var(--ink);
+            border:1px solid var(--accent); border-radius:0;
+        }
+        #count { color:var(--muted); font-size:14px; }
+
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px; }
+        .card { background:#fff; border:1px solid var(--line); border-radius:0; padding:20px; }
+        .card h3 { margin:0 0 6px; color:var(--accent); font-size:18px; font-weight:700; }
+        .card .desc { margin:0 0 10px; color:var(--muted); font-size:14px; }
+        .card .price { font-weight:800; }
+
+        #empty { display:none; color:var(--muted); padding:24px 0; font-style:italic; }
+    </style>
+</head>
+<body>
+
+<img class="site-logo" src="https://totalonion.com/wp-content/uploads/2024/05/onion-logo-black.svg" alt="Total Onion logo">
+
+<button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+<nav class="menu" id="menu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="products.html">Our Services</a>
+    <a href="contact.html">Contact us</a>
+    <span style="display:block; font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; padding:10px 0 4px;">Total Onion live</span>
+    <a href="https://totalonion.com/" target="_blank" rel="noopener">Home</a>
+    <a href="https://totalonion.com/services/" target="_blank" rel="noopener">Services</a>
+    <a href="https://totalonion.com/case-studies/" target="_blank" rel="noopener">Case studies</a>
+    <a href="https://totalonion.com/careers/" target="_blank" rel="noopener">Careers</a>
+    <a href="https://totalonion.com/blog/" target="_blank" rel="noopener">Blog</a>
+</nav>
+
+<h1>Our Services</h1>
+<p>Digital products and services, built end to end by Total Onion.</p>
+
+<div class="label">What we do</div>
+
+<div class="search-row">
+    <input id="search" type="text" placeholder="Search services..." aria-label="Search services">
+    <span id="count"></span>
+</div>
+
+<div class="grid" id="grid"></div>
+<p id="empty">No services match your search.</p>
+
+<script>
+const PRODUCTS = [
+    { name: 'Web Design',            price: 4500, desc: 'Bespoke, brand-led website design.' },
+    { name: 'Web Development',       price: 6000, desc: 'Fast, accessible builds in modern stacks.' },
+    { name: 'E-commerce',           price: 8000, desc: 'Online stores built to convert.' },
+    { name: 'UX / UI Design',        price: 3500, desc: 'Research-led interfaces users love.' },
+    { name: 'Branding & Identity',   price: 3000, desc: 'Logos, guidelines and visual systems.' },
+    { name: 'SEO & Performance',     price: 1200, desc: 'Get found and load fast.' },
+    { name: 'Hosting & Support',     price: 1200, desc: 'Secure hosting and ongoing care.' },
+    { name: 'Analytics & CRO',       price: 1800, desc: 'Measure, test and improve conversion.' },
+];
+
+const grid  = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const count = document.getElementById('count');
+const search = document.getElementById('search');
+
+function render(list) {
+    grid.innerHTML = list.map(p => `
+        <div class="card">
+            <h3>${p.name}</h3>
+            <p class="desc">${p.desc}</p>
+            <p class="price">from &pound;${p.price.toLocaleString()}</p>
+        </div>`).join('');
+    empty.style.display = list.length ? 'none' : 'block';
+    count.textContent = `${list.length} of ${PRODUCTS.length} services`;
+}
+
+function applyFilter() {
+    const q = search.value.trim().toLowerCase();
+    const list = q ? PRODUCTS.filter(p => (p.name + ' ' + p.desc).toLowerCase().includes(q)) : PRODUCTS;
+    render(list);
+}
+
+search.addEventListener('input', applyFilter);
+render(PRODUCTS);
+
+function toggleMenu() {
+    const open = document.getElementById('menu').classList.toggle('is-open');
+    const btn = document.querySelector('.menu-btn');
+    btn.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+</script>
+
+</body>
+</html>

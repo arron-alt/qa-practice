@@ -2,88 +2,220 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quality Assurance at Total Onion — how we keep every layer flawless, from user journeys to test coverage.">
     <title>Total Onion — QA Practice</title>
     <style>
         :root {
-            --bg: #1a1a2e;
-            --panel: #0f0f1e;
-            --accent: #4ade80;
-            --muted: #9ca3af;
-            --error: #ef4444;
+            --bg: #ffffff;
+            --ink: #111111;
+            --accent: #000000;
+            --muted: #666666;
+            --line: #e2e2e2;
+            --error: #111111;
         }
+        html { background: var(--bg); }
         body {
             margin: 0;
-            padding: 40px;
-            background: var(--bg);
-            color: white;
-            font: 16px/1.5 Arial, sans-serif;
+            padding: 96px 48px 48px;
+            background: transparent;
+            color: var(--ink);
+            font: 16px/1.6 "Helvetica Neue", Arial, sans-serif;
+            position: relative;
         }
-        h1 { color: var(--accent); }
-        a  { color: var(--accent); }
+        #bg-code {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            display: block;
+            opacity: 0.55;
+        }
+        h1 {
+            color: var(--accent);
+            font-size: 44px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 0 0 8px;
+        }
+        p { color: var(--ink); }
+        a { color: var(--accent); text-decoration: underline; }
+        nav a { display: inline-block; margin: 6px 0; }
 
         /* Age gate */
         .gate {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,.95);
+            background: rgba(255,255,255,.96);
             display: grid; place-items: center;
             z-index: 9999;
         }
         .gate__box {
             border: 2px solid var(--accent);
+            background: #fff;
             padding: 40px;
             max-width: 380px;
             text-align: center;
         }
+        .gate__box h2 { margin-top: 0; font-weight: 800; }
         .gate__inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
         .gate__inputs input {
-            width: 60px; padding: 8px;
+            width: 60px; padding: 10px;
             font-size: 18px; text-align: center;
-            background: var(--panel); color: white;
-            border: 1px solid var(--accent); border-radius: 4px;
+            background: #fff; color: var(--ink);
+            border: 1px solid var(--accent); border-radius: 0;
         }
         .gate__inputs input.yr { width: 90px; }
         .gate__btn {
-            padding: 10px 30px; font-size: 16px;
-            background: var(--accent); color: black;
-            border: none; border-radius: 4px; cursor: pointer;
+            padding: 12px 32px; font-size: 16px; font-weight: 600;
+            background: var(--accent); color: #fff;
+            border: none; border-radius: 0; cursor: pointer;
         }
-        .gate__error { color: var(--error); min-height: 1.2em; margin-top: 10px; }
+        .gate__error { color: var(--error); font-weight: 700; min-height: 1.2em; margin-top: 10px; }
+
+        /* Under-18 block screen */
+        .rickroll-wrap {
+            position: fixed; inset: 0; overflow: hidden;
+            z-index: 0; background: #000;
+        }
+        .rickroll-wrap iframe {
+            position: absolute; top: 50%; left: 50%;
+            width: 110vw; height: 61.88vw;            /* 16:9, 10% oversize */
+            min-width: 195.56vh; min-height: 110vh;   /* 16:9, 10% oversize */
+            transform: translate(-50%, -50%);         /* centre; oversize crops the YouTube chrome */
+            border: 0; pointer-events: none;
+        }
+        .too-young {
+            position: fixed; inset: 0; margin: 0;
+            display: grid; place-items: center;
+            text-align: center; color: #fff;
+            text-shadow: 0 2px 14px rgba(0,0,0,.85);  /* keeps text readable over video */
+            z-index: 1;
+        }
+        .too-young__msg { margin: 0 0 18px; font-size: 48px; color: #fff; }
+        .countdown { font: 700 26px/1.4 "Helvetica Neue", Arial, sans-serif; letter-spacing: 1px; }
+        .countdown small {
+            display: block; margin-top: 8px;
+            font-weight: 400; font-size: 13px; letter-spacing: 2px;
+            text-transform: uppercase; opacity: .8;
+        }
 
         /* Cookie banner */
         .cookies {
             position: fixed;
             bottom: 20px; left: 20px; right: 20px;
             max-width: 700px; margin: 0 auto;
-            background: var(--panel);
+            background: #fff;
             border: 1px solid var(--accent);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 0;
+            padding: 24px;
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,.12);
         }
-        .cookies__title { color: var(--accent); margin: 0 0 8px; font-size: 18px; }
+        .cookies__title { color: var(--accent); margin: 0 0 8px; font-size: 18px; font-weight: 800; }
         .cookies__text  { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
         .cookies__row   { display: flex; gap: 10px; flex-wrap: wrap; }
         .cookies__btn {
-            padding: 8px 20px; font-size: 14px;
-            border: none; border-radius: 4px; cursor: pointer;
+            padding: 10px 22px; font-size: 14px; font-weight: 600;
+            border: 1px solid var(--accent); border-radius: 0; cursor: pointer;
         }
-        .cookies__btn--accept { background: var(--accent); color: black; }
-        .cookies__btn--reject { background: transparent; color: white; border: 1px solid var(--muted); }
-        .cookies__btn--custom { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+        .cookies__btn--accept { background: var(--accent); color: #fff; }
+        .cookies__btn--reject { background: #fff; color: var(--accent); }
+        .cookies__btn--custom { background: #fff; color: var(--accent); }
 
-        /* Customise panel */
         .cookies__panel { margin-top: 16px; display: none; }
         .cookies__panel.is-open { display: block; }
         .cookies__option {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-top: 1px solid #333;
+            padding: 10px 0; border-top: 1px solid var(--line);
         }
         .cookies__option small { display: block; color: var(--muted); }
-        .cookies__option input[type="checkbox"] { transform: scale(1.4); }
+        .cookies__option input[type="checkbox"] { transform: scale(1.4); accent-color: #000; }
+
+        /* Burger menu (top-left) */
+        .menu-btn {
+            position: fixed; top: 25px; right: 20px; z-index: 200;
+            width: 40px; height: 40px;                 /* 40x40 hit area, like the live site */
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; line-height: 1; padding: 0;
+            background: none; border: none; color: #000; cursor: pointer;
+            transition: transform .25s ease;                /* smooth rotate */
+        }
+        .menu-btn.is-open { transform: rotate(90deg); }     /* turns straight up when open */
+        .menu {
+            position: fixed; top: 60px; right: 20px; z-index: 200;
+            min-width: 230px;
+            background: #fff; border: 1px solid var(--accent); padding: 12px 18px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);          /* start slightly raised */
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+        }
+        .menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);             /* slide down into place */
+        }
+        .menu a { display: block; padding: 8px 0; }
+
+        /* QA team section */
+        .qa-section { max-width: 900px; margin: 48px auto 0; }
+        .label {
+            display: flex; align-items: center; gap: 14px;
+            text-transform: uppercase; letter-spacing: 2px;
+            font-size: 12px; color: var(--muted);
+            margin: 0 0 20px;
+        }
+        .label::before, .label::after { content: ""; height: 1px; background: var(--line); flex: 1; }
+        .qa-intro { color: var(--muted); max-width: 640px; margin: 0 auto 28px; text-align: center; }
+        .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .qa-card { border: 1px solid var(--line); background: #fff; padding: 24px; }
+        .qa-photo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; display: block; margin-bottom: 16px; background: #eee; }
+        .qa-card blockquote { margin: 0 0 16px; font-size: 16px; line-height: 1.6; }
+        .qa-card .qa-name { font-weight: 700; font-size: 14px; }
+        .qa-card .qa-handle { color: var(--muted); font-weight: 400; }
+        .qa-card .qa-role { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+        /* Careers call-to-action */
+        .cta { text-align: center; margin: 56px auto 24px; }
+        .cta a {
+            display: inline-block;
+            background: #000; color: #fff;
+            padding: 16px 40px; font-size: 16px; font-weight: 600;
+            text-decoration: none; border: 1px solid #000;
+            transition: background .2s ease, color .2s ease;
+        }
+        .cta a:hover { background: #fff; color: #000; }
+
+        /* Site logo (top-right corner) */
+        .site-logo {
+            position: fixed;   /* stays put even when the page scrolls */
+            top: 20px;
+            left: 20px;        /* now top-left, matching the live Total Onion site */
+            width: 50px;       /* matches the ~50px logo on the live site */
+            height: auto;
+            z-index: 10000;    /* sits on top of everything, even the age gate */
+        }
     </style>
 </head>
 <body>
+
+<canvas id="bg-code"></canvas>
+<img class="site-logo" src="https://totalonion.com/wp-content/uploads/2024/05/onion-logo-black.svg" alt="Total Onion logo">
+
+<!-- Burger menu (top-left) -->
+<button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+<nav class="menu" id="menu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="products.html">Our Services</a>
+    <a href="contact.html">Contact us</a>
+    <a href="#" onclick="resetCookies(); return false;">Reset cookie choice (for QA testing)</a>
+    <span style="display:block; font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; padding:10px 0 4px;">Total Onion live</span>
+    <a href="https://totalonion.com/" target="_blank" rel="noopener">Home</a>
+    <a href="https://totalonion.com/services/" target="_blank" rel="noopener">Services</a>
+    <a href="https://totalonion.com/case-studies/" target="_blank" rel="noopener">Case studies</a>
+    <a href="https://totalonion.com/careers/" target="_blank" rel="noopener">Careers</a>
+    <a href="https://totalonion.com/blog/" target="_blank" rel="noopener">Blog</a>
+</nav>
 
 <!-- Age gate -->
 <div class="gate" id="gate">
@@ -91,9 +223,9 @@
         <h2>Are you old enough?</h2>
         <p>You'll need to be 18 or over to peel back the layers.</p>
         <div class="gate__inputs">
-            <input id="dd" maxlength="2" placeholder="DD" inputmode="numeric">
-            <input id="mm" maxlength="2" placeholder="MM" inputmode="numeric">
-            <input id="yyyy" maxlength="4" class="yr" placeholder="YYYY" inputmode="numeric">
+            <input id="dd" maxlength="2" placeholder="DD" inputmode="numeric" aria-label="Day of birth">
+            <input id="mm" maxlength="2" placeholder="MM" inputmode="numeric" aria-label="Month of birth">
+            <input id="yyyy" maxlength="4" class="yr" placeholder="YYYY" inputmode="numeric" aria-label="Year of birth">
         </div>
         <button class="gate__btn" onclick="verifyAge()">Let me in</button>
         <p class="gate__error" id="err"></p>
@@ -101,10 +233,37 @@
 </div>
 
 <!-- Page content -->
-<h1>Hello QA Universe</h1>
-<p>This is my QA test page.</p>
-<p><a href="about.html">Go to About page</a></p>
-<p><a href="#" onclick="resetCookies(); return false;">Reset cookie choice (for QA testing)</a></p>
+<h1>Quality Assurance at Total Onion</h1>
+<p>How we keep every layer flawless: we pair innovation with practical solutions, applying modern QA skills and tools to deliver first-class quality. We don&rsquo;t see a website as a straightforward path &mdash; we see an expanding root system, covering everything from user accessibility to the key structured pages that guide people to what they need.</p>
+
+<!-- QA team section -->
+<section class="qa-section">
+    <div class="label">Life in QA at Total Onion</div>
+    <p class="qa-intro">
+        Our QA engineers are part of the projects from day one, working closely with devs, marketing,
+        and brand &mdash; pulling requirements out of designs, shaping test coverage, and shipping with
+        confidence. Here&rsquo;s what a few of them say about testing at Total Onion.
+    </p>
+    <div class="qa-grid">
+        <div class="qa-card">
+            <img class="qa-photo" src="arron.jpg" alt="Arron Canning">
+            <blockquote>&ldquo;Three years ago I took a leap of faith and started a QA internship with Total Onion. From the get-go I was welcomed by the team, learning head-first about QA and how to understand URLs. It&rsquo;s so rewarding to learn as you work &mdash; your progress and your decision-making get sharper over time. If you&rsquo;re looking for perfection and innovation, then QA may be the role for you.&rdquo;</blockquote>
+            <div class="qa-name">Arron Canning <span class="qa-handle">(Sa1ntac)</span></div>
+            <div class="qa-role">QA Engineer</div>
+        </div>
+        <div class="qa-card">
+            <img class="qa-photo" src="https://placehold.co/72x72?text=JS" alt="James Stott">
+            <blockquote>Will add if consent is given by respected member.</blockquote>
+            <div class="qa-name">James Stott</div>
+            <div class="qa-role">QA Lead</div>
+        </div>
+    </div>
+</section>
+
+<!-- Careers CTA -->
+<section class="cta">
+    <a href="https://totalonion.com/careers/" target="_blank" rel="noopener">View careers at Total Onion</a>
+</section>
 
 <!-- Cookie banner -->
 <div class="cookies" id="cookies" style="display:none">
@@ -147,30 +306,105 @@
 </div>
 
 <script>
-/* --- Age gate (from before) --- */
+/* --- Age gate --- */
 function verifyAge() {
-    const dd = +document.getElementById('dd').value;
-    const mm = +document.getElementById('mm').value;
-    const yyyy = +document.getElementById('yyyy').value;
+    const ddRaw = document.getElementById('dd').value.trim();
+    const mmRaw = document.getElementById('mm').value.trim();
+    const yRaw  = document.getElementById('yyyy').value.trim();
     const err = document.getElementById('err');
     err.textContent = '';
 
-    if (!dd || !mm || !yyyy) return err.textContent = 'Fill in all three fields.';
-    if (dd > 31 || mm > 12 || yyyy < 1900 || yyyy > new Date().getFullYear()) {
+    if (!ddRaw || !mmRaw || !yRaw) return err.textContent = 'Fill in all three fields.';
+    if (!/^\d+$/.test(ddRaw) || !/^\d+$/.test(mmRaw) || !/^\d+$/.test(yRaw)) {
+        return err.textContent = 'Please use numbers only.';
+    }
+
+    const dd = +ddRaw, mm = +mmRaw, yyyy = +yRaw;
+    const today = new Date();
+
+    // Real-calendar check: rejects 31 Feb, 31 Apr, day/month < 1, future dates, 2-digit years, etc.
+    const dob = new Date(yyyy, mm - 1, dd);
+    const realDate = dob.getFullYear() === yyyy && dob.getMonth() === mm - 1 && dob.getDate() === dd;
+    if (yyyy < 1900 || !realDate || dob > today) {
         return err.textContent = "That date doesn't look right.";
     }
 
-    const today = new Date();
     let age = today.getFullYear() - yyyy;
     const beforeBirthday = (today.getMonth() + 1 < mm) ||
                            (today.getMonth() + 1 === mm && today.getDate() < dd);
     if (beforeBirthday) age--;
 
     if (age >= 18) {
+        sessionStorage.setItem('ageVerified', '1');  // remember for THIS session only — cleared when the browser/tab closes
         document.getElementById('gate').remove();
         showCookiesIfNeeded();
     } else {
-        document.body.innerHTML = '<h1 style="text-align:center;margin-top:100px">Come back when you\'re older.</h1>';
+        const eligible = new Date(yyyy + 18, mm - 1, dd);     // the day they turn 18
+        localStorage.setItem('ageFailed', '1');               // remember the fail so a refresh can't escape
+        localStorage.setItem('eligibleAt', eligible.getTime()); // remember when they can legally enter
+        blockUnderage("Come back when you're older.");
+    }
+}
+
+/* --- Under-18 block screen + rickroll (audio at 20%) --- */
+function blockUnderage(message) {
+    document.body.style.background = '#000';
+    const eligibleAt = +localStorage.getItem('eligibleAt') || 0;
+    document.body.innerHTML =
+        '<div class="rickroll-wrap"><div id="rickroll-player"></div></div>' +
+        '<div class="too-young"><div>' +
+            '<h1 class="too-young__msg">' + message + '</h1>' +
+            (eligibleAt ? '<div class="countdown" id="countdown"></div>' : '') +
+        '</div></div>';
+    if (eligibleAt) startCountdown(eligibleAt);
+    loadRickroll();
+}
+
+/* --- Live countdown to the user's 18th birthday --- */
+function startCountdown(eligibleAt) {
+    const el = document.getElementById('countdown');
+    if (!el) return;
+    const pad = n => String(n).padStart(2, '0');
+    let timer;
+    function tick() {
+        const diff = eligibleAt - Date.now();
+        if (diff <= 0) {                       // they've turned 18 — let them back in
+            localStorage.removeItem('ageFailed');
+            localStorage.removeItem('eligibleAt');
+            el.innerHTML = "You're old enough now.<small>Refresh the page to enter</small>";
+            clearInterval(timer);
+            return;
+        }
+        const s = Math.floor(diff / 1000);
+        const days = Math.floor(s / 86400);
+        const years = Math.floor(days / 365);
+        const remDays = days - years * 365;
+        const big = (years > 0 ? years + 'y ' : '') + remDays + 'd ' +
+                    pad(Math.floor((s % 86400) / 3600)) + ':' +
+                    pad(Math.floor((s % 3600) / 60)) + ':' + pad(s % 60);
+        el.innerHTML = big + '<small>until you can legally enter</small>';
+    }
+    tick();
+    timer = setInterval(tick, 1000);
+}
+
+function loadRickroll() {
+    function create() {
+        new YT.Player('rickroll-player', {
+            videoId: 'dQw4w9WgXcQ',
+            playerVars: { autoplay: 1, controls: 0, loop: 1, playlist: 'dQw4w9WgXcQ', playsinline: 1, modestbranding: 1, rel: 0 },
+            events: {
+                onReady: function (e) { e.target.unMute(); e.target.setVolume(20); e.target.playVideo(); }
+            }
+        });
+    }
+    if (window.YT && window.YT.Player) {
+        create();
+    } else {
+        window.onYouTubeIframeAPIReady = create;
+        var tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
     }
 }
 
@@ -213,6 +447,60 @@ function resetCookies() {
     document.getElementById('cookies').style.display = 'block';
     document.getElementById('cookiePanel').classList.remove('is-open');
 }
+
+function toggleMenu() {
+    const open = document.getElementById('menu').classList.toggle('is-open');
+    const btn = document.querySelector('.menu-btn');
+    btn.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+/* On load:
+   - if they failed earlier, keep them blocked (refresh can't escape)
+   - else if they passed earlier THIS session, skip the gate (until the browser/tab is closed) */
+if (localStorage.getItem('ageFailed')) {
+    blockUnderage('Nice try ;)');
+} else if (sessionStorage.getItem('ageVerified')) {
+    const g = document.getElementById('gate');
+    if (g) g.remove();
+    showCookiesIfNeeded();
+}
+</script>
+
+<script>
+/* --- Animated "moving code" background (monochrome) --- */
+(function () {
+    const canvas = document.getElementById('bg-code');
+    const ctx = canvas.getContext('2d');
+    const glyphs = '01{}[]()<>/=;:+-*&|!?$#.consoletfunctioreturIfvalcs'.split('');
+    const fontSize = 16;
+    let cols, drops;
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        cols = Math.floor(canvas.width / fontSize);
+        drops = new Array(cols).fill(0).map(() => Math.random() * (canvas.height / fontSize));
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function draw() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';   // fade trail on white
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < cols; i++) {
+            const ch = glyphs[Math.floor(Math.random() * glyphs.length)];
+            const x = i * fontSize;
+            const y = drops[i] * fontSize;
+            ctx.fillStyle = Math.random() > 0.97 ? '#222222' : '#c2c2c2'; // dark head, light-grey trail
+            ctx.fillText(ch, x, y);
+            if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(draw, 50);
+})();
 </script>
 
 </body>
