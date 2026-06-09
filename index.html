@@ -195,11 +195,13 @@
         .qa-card .qa-role { color: var(--muted); font-size: 13px; margin-top: 2px; }
 
         /* Tools-we-use logo strip (above the QA label) */
-        .tools { display: flex; justify-content: center; align-items: center; gap: 34px; flex-wrap: wrap; margin: 0 0 34px; }
-        .tools img { height: 34px; width: auto; opacity: .55; filter: grayscale(1); transition: opacity .2s ease, filter .2s ease; }
-        .tools img:hover { opacity: 1; filter: grayscale(0); }   /* full colour on hover */
-        body.dark .tools img, body.hc .tools img { filter: grayscale(1) invert(1); }   /* light monochrome on dark themes */
-        body.dark .tools img:hover, body.hc .tools img:hover { filter: grayscale(0); }
+        .tools { display: flex; justify-content: center; align-items: flex-start; gap: 38px; flex-wrap: wrap; margin: 0 0 34px; }
+        .tool { display: flex; flex-direction: column; align-items: center; gap: 9px; margin: 0; }
+        .tool img { height: 34px; width: auto; opacity: .55; filter: grayscale(1); transition: opacity .2s ease, filter .2s ease; }
+        .tool:hover img { opacity: 1; filter: grayscale(0); }   /* full colour on hover */
+        .tool figcaption { font-size: 12px; font-weight: 600; letter-spacing: .3px; color: var(--muted); white-space: nowrap; }
+        body.dark .tool img, body.hc .tool img { filter: grayscale(1) invert(1); }   /* light monochrome on dark themes */
+        body.dark .tool:hover img, body.hc .tool:hover img { filter: grayscale(0); }
 
         /* "Meet the QA team" sub-heading */
         .qa-subhead { text-align: center; font-size: 22px; font-weight: 800; color: var(--accent); margin: 32px 0 22px; }
@@ -223,7 +225,10 @@
             width: 50px;       /* matches the ~50px logo on the live site */
             height: auto;
             z-index: 10000;    /* sits on top of everything, even the age gate */
+            transition: opacity .35s ease, transform .35s ease;
         }
+        /* fade the corner logo out once the user scrolls, so it never clashes with body text */
+        body.entered .site-logo.scrolled { opacity: 0; transform: translateY(-8px); pointer-events: none; }
 
         /* Dyslexia-friendly mode (toggled from the menu) */
         body.dyslexic {
@@ -351,11 +356,11 @@
 <!-- QA team section -->
 <section class="qa-section">
     <div class="tools" aria-label="Tools we use">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="Visual Studio Code">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg" alt="Jira">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git">
+        <figure class="tool"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="Visual Studio Code"><figcaption>VS Code</figcaption></figure>
+        <figure class="tool"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker"><figcaption>Docker</figcaption></figure>
+        <figure class="tool"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma"><figcaption>Figma</figcaption></figure>
+        <figure class="tool"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg" alt="Jira"><figcaption>Jira</figcaption></figure>
+        <figure class="tool"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git"><figcaption>Git</figcaption></figure>
     </div>
     <div class="label" data-i18n="qa.label">Life in QA at Total Onion</div>
     <p class="qa-intro" data-i18n="qa.intro">
@@ -818,5 +823,15 @@ if (localStorage.getItem('ageFailed')) {
 })();
 </script>
 
+    <script>
+    // Hide the corner logo once the user scrolls down, so it doesn't clash with body text.
+    (function () {
+        var logo = document.querySelector('.site-logo');
+        if (!logo) return;
+        function onScroll() { logo.classList.toggle('scrolled', window.scrollY > 60); }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+    </script>
 </body>
 </html>
