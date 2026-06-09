@@ -194,6 +194,15 @@
         .qa-card .qa-handle { color: var(--muted); font-weight: 400; }
         .qa-card .qa-role { color: var(--muted); font-size: 13px; margin-top: 2px; }
 
+        /* Tools-we-use logo strip (above the QA label) */
+        .tools { display: flex; justify-content: center; align-items: center; gap: 34px; flex-wrap: wrap; margin: 0 0 34px; }
+        .tools img { height: 34px; width: auto; opacity: .55; transition: opacity .2s ease; }
+        .tools img:hover { opacity: 1; }
+        body.dark .tools img, body.hc .tools img { filter: invert(1); }   /* flip to white on dark themes */
+
+        /* "Meet the QA team" sub-heading */
+        .qa-subhead { text-align: center; font-size: 22px; font-weight: 800; color: var(--accent); margin: 32px 0 22px; }
+
         /* Careers call-to-action */
         .cta { text-align: center; margin: 0 auto 24px; }
         .cta a {
@@ -340,12 +349,20 @@
 
 <!-- QA team section -->
 <section class="qa-section">
+    <div class="tools" aria-label="Tools we use">
+        <img src="https://cdn.simpleicons.org/visualstudiocode/111111" alt="Visual Studio Code">
+        <img src="https://cdn.simpleicons.org/docker/111111" alt="Docker">
+        <img src="https://cdn.simpleicons.org/figma/111111" alt="Figma">
+        <img src="https://cdn.simpleicons.org/jira/111111" alt="Jira">
+        <img src="https://cdn.simpleicons.org/git/111111" alt="Git">
+    </div>
     <div class="label" data-i18n="qa.label">Life in QA at Total Onion</div>
     <p class="qa-intro" data-i18n="qa.intro">
         Our QA engineers are part of the projects from day one, working closely with devs, marketing,
         and brand &mdash; pulling requirements out of designs, shaping test coverage, and shipping with
         confidence. Here&rsquo;s what a few of them say about testing at Total Onion.
     </p>
+    <h2 class="qa-subhead" data-i18n="qa.subhead">Meet the QA team that keeps the layers together</h2>
     <div class="qa-grid">
         <div class="qa-card">
             <img class="qa-photo" src="arron.jpg" alt="Arron Canning">
@@ -495,11 +512,18 @@ function startCountdown(eligibleAt) {
 
 function loadRickroll() {
     function create() {
-        new YT.Player('rickroll-player', {
+        const player = new YT.Player('rickroll-player', {
             videoId: 'dQw4w9WgXcQ',
-            playerVars: { autoplay: 1, controls: 0, loop: 1, playlist: 'dQw4w9WgXcQ', playsinline: 1, modestbranding: 1, rel: 0 },
+            // mute:1 means autoplay is ALWAYS allowed — a refresh has no user gesture, and
+            // browsers block unmuted autoplay without one (that was the "frozen on refresh" bug).
+            playerVars: { autoplay: 1, controls: 0, loop: 1, playlist: 'dQw4w9WgXcQ', playsinline: 1, modestbranding: 1, rel: 0, mute: 1 },
             events: {
-                onReady: function (e) { e.target.unMute(); e.target.setVolume(20); e.target.playVideo(); }
+                onReady: function (e) {
+                    e.target.mute();
+                    e.target.setVolume(20);
+                    e.target.playVideo();
+                    armUnmute(e.target);   // bring the sound in on the first click/keypress
+                }
             }
         });
     }
@@ -511,6 +535,15 @@ function loadRickroll() {
         tag.src = 'https://www.youtube.com/iframe_api';
         document.head.appendChild(tag);
     }
+}
+
+/* Unmute the rickroll on the user's first interaction (browsers require a gesture for sound). */
+function armUnmute(player) {
+    function go() {
+        try { player.unMute(); player.setVolume(20); player.playVideo(); } catch (e) {}
+        ['click', 'keydown', 'touchstart'].forEach(ev => document.removeEventListener(ev, go));
+    }
+    ['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, go));
 }
 
 /* --- Cookies --- */
@@ -568,6 +601,7 @@ const translations = {
     'hero.h1': 'Quality Assurance at Total Onion',
     'hero.p': `How we keep every layer flawless: we pair innovation with practical solutions, applying modern QA skills and tools to deliver first-class quality. We don’t see a website as a straightforward path — we see an expanding root system, covering everything from user accessibility to the key structured pages that guide people to what they need.`,
     'qa.label': 'Life in QA at Total Onion',
+    'qa.subhead': 'Meet the QA team that keeps the layers together',
     'qa.intro': `Our QA engineers are part of the projects from day one, working closely with devs, marketing, and brand — pulling requirements out of designs, shaping test coverage, and shipping with confidence. Here’s what a few of them say about testing at Total Onion.`,
     'qa.arron': `“Three years ago I took a leap of faith and started a QA internship with Total Onion. From the get-go I was welcomed by the team, learning head-first about QA and how to understand URLs. It’s so rewarding to learn as you work — your progress and your decision-making get sharper over time. If you’re looking for perfection and innovation, then QA may be the role for you.”`,
     'qa.james': 'Will add if consent is given by respected member.',
@@ -584,6 +618,7 @@ const translations = {
     'hero.h1': 'Assurance qualité chez Total Onion',
     'hero.p': `Comment nous gardons chaque couche irréprochable : nous associons l’innovation à des solutions concrètes, en appliquant des compétences et des outils QA modernes pour offrir une qualité de premier ordre. Nous ne voyons pas un site web comme un chemin linéaire — mais comme un système racinaire qui s’étend, couvrant tout, de l’accessibilité aux pages structurées qui guident les visiteurs vers ce dont ils ont besoin.`,
     'qa.label': 'La vie en QA chez Total Onion',
+    'qa.subhead': 'Rencontrez l’équipe QA qui maintient chaque couche en place',
     'qa.intro': `Nos ingénieurs QA font partie des projets dès le premier jour, en collaboration étroite avec les développeurs, le marketing et la marque — en extrayant les exigences des maquettes, en façonnant la couverture de tests et en livrant en toute confiance. Voici ce qu’en disent quelques-uns sur les tests chez Total Onion.`,
     'qa.arron': `« Il y a trois ans, j’ai pris un risque et commencé un stage QA chez Total Onion. Dès le départ, l’équipe m’a accueilli, et j’ai appris le QA et la compréhension des URL sur le terrain. C’est tellement gratifiant d’apprendre en travaillant — vos progrès et vos décisions s’affinent avec le temps. Si vous recherchez la perfection et l’innovation, le QA est peut-être le rôle qu’il vous faut. »`,
     'qa.james': 'À ajouter si le membre concerné donne son accord.',
@@ -600,6 +635,7 @@ const translations = {
     'hero.h1': 'Aseguramiento de calidad en Total Onion',
     'hero.p': `Cómo mantenemos cada capa impecable: combinamos innovación con soluciones prácticas, aplicando habilidades y herramientas de QA modernas para ofrecer una calidad de primer nivel. No vemos un sitio web como un camino lineal, sino como un sistema de raíces en expansión, que abarca desde la accesibilidad hasta las páginas estructuradas clave que guían a las personas hacia lo que necesitan.`,
     'qa.label': 'La vida en QA en Total Onion',
+    'qa.subhead': 'Conoce al equipo de QA que mantiene unidas las capas',
     'qa.intro': `Nuestros ingenieros de QA forman parte de los proyectos desde el primer día, trabajando estrechamente con desarrolladores, marketing y marca: extrayendo requisitos de los diseños, dando forma a la cobertura de pruebas y lanzando con confianza. Esto es lo que algunos dicen sobre las pruebas en Total Onion.`,
     'qa.arron': `«Hace tres años di un salto de fe y comencé unas prácticas de QA en Total Onion. Desde el principio, el equipo me acogió, y aprendí de lleno sobre QA y cómo entender las URL. Es muy gratificante aprender mientras trabajas: tu progreso y tu toma de decisiones se afinan con el tiempo. Si buscas perfección e innovación, QA puede ser el puesto para ti.»`,
     'qa.james': 'Se añadirá si el miembro correspondiente da su consentimiento.',
@@ -616,6 +652,7 @@ const translations = {
     'hero.h1': 'Qualitätssicherung bei Total Onion',
     'hero.p': `Wie wir jede Schicht makellos halten: Wir verbinden Innovation mit praktischen Lösungen und setzen moderne QA-Fähigkeiten und -Werkzeuge ein, um erstklassige Qualität zu liefern. Wir sehen eine Website nicht als geraden Weg — sondern als ein sich ausbreitendes Wurzelsystem, das alles abdeckt, von der Barrierefreiheit bis zu den zentralen strukturierten Seiten, die Menschen zu dem führen, was sie brauchen.`,
     'qa.label': 'QA-Alltag bei Total Onion',
+    'qa.subhead': 'Lernen Sie das QA-Team kennen, das die Schichten zusammenhält',
     'qa.intro': `Unsere QA-Ingenieure sind von Tag eins Teil der Projekte und arbeiten eng mit Entwicklern, Marketing und Marke zusammen — sie leiten Anforderungen aus Designs ab, gestalten die Testabdeckung und liefern mit Zuversicht. Hier ist, was einige von ihnen über das Testen bei Total Onion sagen.`,
     'qa.arron': `„Vor drei Jahren wagte ich den Sprung und begann ein QA-Praktikum bei Total Onion. Von Anfang an wurde ich vom Team aufgenommen und lernte QA und das Verständnis von URLs aus erster Hand. Es ist so lohnend, beim Arbeiten zu lernen — dein Fortschritt und deine Entscheidungen werden mit der Zeit schärfer. Wenn du Perfektion und Innovation suchst, könnte QA die richtige Rolle für dich sein."`,
     'qa.james': 'Wird ergänzt, sofern das betreffende Mitglied zustimmt.',
