@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="About Total Onion — try the QA terminal: reproduce a real-world bug and file it.">
     <title>About — Total Onion QA Terminal</title>
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/opendyslexic">
     <style>
         :root { --accent: #00968f; }
         * { box-sizing: border-box; }
@@ -112,28 +113,56 @@
             .monitor { width: 94vw; top: 47%; }
             .screen { font-size: 12.5px; height: 58vh; }
         }
+
+        /* dyslexia-friendly mode (does not affect the monospace terminal) */
+        body.dyslexic { font-family:'OpenDyslexic','Comic Sans MS',sans-serif; letter-spacing:.04em; word-spacing:.14em; }
+        /* accessibility & language controls in the menu */
+        .menu__controls { border-top:1px solid #ccc; margin-top:8px; padding-top:10px; }
+        .menu__controls label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#999; margin:8px 0 4px; }
+        .menu__controls select { width:100%; padding:8px; border:1px solid #000; background:#fff; color:#111; border-radius:0; font-size:14px; }
+        .menu__controls .toggle-link { cursor:pointer; display:block; padding:5px 0; color:#000; text-decoration:none; }
+        .menu__controls .toggle-link:hover { color:var(--accent); }
+        .menu__controls .textsize-row { display:flex; gap:6px; margin-top:2px; }
+        .menu__controls .textsize-row button { flex:1; padding:6px; border:1px solid #000; background:#fff; color:#111; border-radius:0; cursor:pointer; font-weight:700; }
     </style>
 </head>
 <body>
     <img class="site-logo" src="https://totalonion.com/wp-content/uploads/2024/05/onion-logo-black.svg" alt="Total Onion logo">
     <button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
     <nav class="menu" id="menu">
-        <a href="index.html">Home</a>
-        <a href="about.html">QA Terminal</a>
-        <a href="products.html">Our Services</a>
-        <a href="contact.html">Contact us</a>
+        <a href="index.html" data-i18n="nav.home">Home</a>
+        <a href="about.html" data-i18n="nav.qa">QA Terminal</a>
+        <a href="products.html" data-i18n="nav.ai">AI in QA</a>
+        <a href="contact.html" data-i18n="nav.contact">Contact us</a>
         <span style="display:block; font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; padding:10px 0 4px;">Total Onion live</span>
         <a href="https://totalonion.com/" target="_blank" rel="noopener">Home</a>
         <a href="https://totalonion.com/services/" target="_blank" rel="noopener">Services</a>
         <a href="https://totalonion.com/case-studies/" target="_blank" rel="noopener">Case studies</a>
         <a href="https://totalonion.com/careers/" target="_blank" rel="noopener">Careers</a>
         <a href="https://totalonion.com/blog/" target="_blank" rel="noopener">Blog</a>
+        <div class="menu__controls">
+            <label data-i18n="ctl.lang">Language</label>
+            <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+            </select>
+            <a class="toggle-link" id="dysToggle" onclick="toggleDyslexia()">Dyslexia-friendly text: Off</a>
+            <label data-i18n="ctl.text">Text size</label>
+            <div class="textsize-row">
+                <button type="button" onclick="zoomStep(-1)" aria-label="Smaller text">A&minus;</button>
+                <button type="button" onclick="zoomReset()">A</button>
+                <button type="button" onclick="zoomStep(1)" aria-label="Larger text">A+</button>
+            </div>
+            <a class="toggle-link" id="ttsToggle" onclick="toggleTTS()" data-i18n="ctl.tts">&#128266; Read page aloud</a>
+        </div>
     </nav>
 
     <div class="office" aria-hidden="true">
         <div class="wall"></div>
         <div class="window"></div>
-        <div class="sticky"><b>QA challenge</b>Can you reproduce the bug and file it?</div>
+        <div class="sticky"><b data-i18n="st.h">QA challenge</b><span data-i18n="st.b">Can you reproduce the bug and file it?</span></div>
         <div class="baseboard"></div>
         <div class="desk"></div>
         <div class="mug"></div>
@@ -169,7 +198,7 @@
     const screen = document.getElementById('screen');
     const inputRow = document.getElementById('input-row');
 
-    let step = 0, done = false, wrong = 0, score = 0, precise = 0;
+    let step = 0, done = false, wrong = 0, score = 0, precise = 0, erred = false, resets = 0;
 
     const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ').replace(/^\//, '').replace(/^open \//, 'open ');
 
@@ -177,19 +206,19 @@
     // pts: points for the precise version · say: lines printed on success · hint: nudge on wrong input
     const stages = [
         { full: ['begin', 'start'], loose: [], pts: 0,
-          say: ['> Ticket QA-117 accepted.', '', 'STEP 1 / 4  —  Open the cart.', ['cmd', 'Type the full command:  open /cart']],
+          say: ['> Ticket QA-117 accepted.', '', 'STEP 1 / 4  —  Open the cart.', ['sys', '(stuck? type  help  for the command)']],
           hint: 'Type  begin  to accept the ticket.' },
         { full: ['open cart', 'open /cart'], loose: ['open'], pts: 25,
-          say: ['🛒 Cart opened — empty.   Total: £0.00', '', 'STEP 2 / 4  —  Add the 12 YO bottle (£20).', ['cmd', 'Type the full command:  add bottle']],
+          say: ['🛒 Cart opened — empty.   Total: £0.00', '', 'STEP 2 / 4  —  Add the 12 YO bottle (£20).'],
           hint: 'Be precise — type the full command:  open /cart' },
         { full: ['add bottle'], loose: ['add', 'add 12yo'], pts: 25,
-          say: ['Added: Glenlivet 12 YO  —  £20.00.   Total: £20.00', '', 'STEP 3 / 4  —  Apply discount code SAVE10.', ['cmd', 'Type the full command:  apply SAVE10']],
+          say: ['Added: Glenlivet 12 YO  —  £20.00.   Total: £20.00', '', 'STEP 3 / 4  —  Apply discount code SAVE10.'],
           hint: 'Be precise — type the full command:  add bottle' },
         { full: ['apply save10'], loose: ['apply'], pts: 25,
-          say: ['Code SAVE10 applied  (−£10.00).   Total: £10.00   ✓ looks correct…', '', ['cmd', 'STEP 4 / 4 — the real test: apply the SAME code again to check it is single-use.'], ['cmd', 'Type the full command:  apply SAVE10']],
+          say: ['Code SAVE10 applied  (−£10.00).   Total: £10.00   ✓ looks correct…', '', ['cmd', 'STEP 4 / 4 — the real test: apply the SAME code again to check it is single-use.']],
           hint: 'Be precise — type the full command:  apply SAVE10' },
         { full: ['apply save10'], loose: ['apply'], pts: 25,
-          say: [['warn', '⚠ SAVE10 applied AGAIN  (−£10.00).   Total: £0.00'], ['err', '🐞 The code is NOT single-use — every re-apply keeps deducting (the total will go negative). Bug reproduced.'], '', 'FINAL  —  Log the defect.', ['cmd', 'Type the full command:  report bug']],
+          say: [['warn', '⚠ SAVE10 applied AGAIN  (−£10.00).   Total: £0.00'], ['err', '🐞 The code is NOT single-use — every re-apply keeps deducting (the total will go negative). Bug reproduced.'], '', 'FINAL  —  Log the defect.'],
           hint: 'Be precise — type the full command:  apply SAVE10' },
         { full: ['report bug'], loose: ['report', 'file bug'], pts: 0,
           say: ['__WIN__'],
@@ -220,12 +249,10 @@
         div.appendChild(a); out.appendChild(div); screen.scrollTop = screen.scrollHeight;
     }
     function help() {
-        print('Available commands:', 'sys');
-        print('  · follow the on-screen prompt and type the command shown', 'sys');
-        print('  · be PRECISE — full commands score more than shorthand', 'sys');
-        print('  · help     — show this', 'sys');
-        print('  · clear    — clear the screen', 'sys');
-        print('  · restart  — start the scenario again', 'sys');
+        if (done) { print('Scenario complete. Type  restart  to play again.', 'sys'); return; }
+        const st = stages[step];
+        print('💡 ' + st.hint, 'sys');
+        print('(other commands:  clear  ·  restart)', 'sys');
     }
     function win() {
         done = true;
@@ -243,16 +270,22 @@
             link('   →  See where QA can take you:  Careers at Total Onion', 'https://totalonion.com/careers/');
             print('', '');
             print('Type  restart  to play again.', 'sys');
-        } else {
-            print('✅  Bug confirmed & filed — solid work, you got there.', 'win');
-            print('But precision is the QA craft: the exact command and repro wording are what let a developer reproduce a bug without guessing. A few of yours were shorthand (partial credit).', '');
-            print('Run it again and aim for a clean, precise 4/4 — that is what unlocks the next step.', 'sys');
+        } else if (score >= 50) {
+            print('✅  Bug confirmed & filed — a solid, decent run.', 'win');
+            print('You found the defect and logged it. A few steps weren\'t first-time precise, and in QA that precision is exactly where the value is — vague repro wording is what gets a bug bounced back.', '');
+            print('Tighten those up for a clean 4/4 and you\'ll unlock the next step.', 'sys');
             print('', '');
-            print('Type  restart  to try for a perfect run.', 'sys');
+            print('Type  restart  to go for a perfect run.', 'sys');
+        } else {
+            print('⚠  Bug filed — but this is a scrape-through.', 'warn');
+            print('You reached the end, but the score shows the precision isn\'t there yet. A report a developer can\'t cleanly reproduce isn\'t much use — that is the bit to nail.', '');
+            print('Run it again — use  help  on any step — and aim higher.', 'sys');
+            print('', '');
+            print('Type  restart  to try again.', 'sys');
         }
     }
     function reset() {
-        step = 0; done = false; wrong = 0; score = 0; precise = 0; out.innerHTML = '';
+        step = 0; done = false; wrong = 0; score = 0; precise = 0; erred = false; out.innerHTML = '';
         boot();
     }
     function handle(raw) {
@@ -261,7 +294,7 @@
         const n = norm(raw);
         if (n === 'help')   { help(); return; }
         if (n === 'clear')  { out.innerHTML = ''; return; }
-        if (n === 'restart'){ reset(); return; }
+        if (n === 'restart'){ resets = 0; reset(); return; }
         if (done) { print('Scenario complete. Type  restart  to play again.', 'sys'); return; }
 
         const st = stages[step];
@@ -270,26 +303,38 @@
             wrong = 0;
             if (st.say[0] === '__WIN__') { win(); return; }
             if (st.pts > 0) {
-                if (exact) {
+                if (exact && !erred) {
                     score += st.pts; precise++;
                     print('   +' + st.pts + ' pts — precise wording ✓     (score ' + score + ')', 'win');
+                } else if (exact && erred) {
+                    score += 10;
+                    print('   +10 pts — correct, but you slipped first. Full marks need a clean first try.     (score ' + score + ')', 'warn');
                 } else {
                     const p = Math.round(st.pts * 0.4);
                     score += p;
                     print('   +' + p + ' pts — partial credit. Type the FULL command for full marks.     (score ' + score + ')', 'warn');
                 }
             }
+            erred = false;
             st.say.forEach(say);
             step++;
         } else {
             wrong++;
+            erred = true;
             if (wrong >= 2) {
+                resets++;
                 const reached = Math.min(4, Math.max(0, step - 1));
                 print('✗ Not quite again.', 'err');
-                print('No problem — this is exactly how QA is learned. You worked through ' + reached + ' of 4 steps. Resetting…', 'sys');
-                print('Think it through: read the ticket in full, reproduce one precise step at a time, type the exact command, and always test the edge case. Slow is smooth, smooth is fast.', '');
+                if (resets >= 2) {
+                    print('This one is fighting you — and that is genuinely fine. QA is patience, not speed.', 'sys');
+                    print('Reminder: type  help  on any step to see the exact command, then walk it through slowly, one precise step at a time.', 'sys');
+                    print('Resetting…', 'sys');
+                } else {
+                    print('No problem — this is exactly how QA is learned. You worked through ' + reached + ' of 4 steps. Resetting…', 'sys');
+                    print('Think it through: read the ticket in full, reproduce one precise step at a time, type the exact command, and always test the edge case. Slow is smooth, smooth is fast.', '');
+                }
                 inp.disabled = true;
-                setTimeout(reset, 2400);
+                setTimeout(reset, 2600);
             } else {
                 print('✗ Not quite. Hint: ' + st.hint, 'err');
             }
@@ -326,6 +371,52 @@
     screen.addEventListener('click', () => { if (!inp.disabled) inp.focus(); });
 
     boot();
+
+    // ---- accessibility & translation tools ----
+    const translations = {
+        en: { 'nav.home':'Home','nav.qa':'QA Terminal','nav.ai':'AI in QA','nav.contact':'Contact us',
+              'ctl.lang':'Language','ctl.text':'Text size','ctl.tts':'🔊 Read page aloud',
+              'st.h':'QA challenge','st.b':'Can you reproduce the bug and file it?' },
+        fr: { 'nav.home':'Accueil','nav.qa':'Terminal QA','nav.ai':'L’IA en QA','nav.contact':'Contactez-nous',
+              'ctl.lang':'Langue','ctl.text':'Taille du texte','ctl.tts':'🔊 Lire la page',
+              'st.h':'Défi QA','st.b':'Pouvez-vous reproduire le bug et le signaler ?' },
+        es: { 'nav.home':'Inicio','nav.qa':'Terminal QA','nav.ai':'La IA en QA','nav.contact':'Contáctanos',
+              'ctl.lang':'Idioma','ctl.text':'Tamaño del texto','ctl.tts':'🔊 Leer la página',
+              'st.h':'Reto de QA','st.b':'¿Puedes reproducir el error y reportarlo?' },
+        de: { 'nav.home':'Startseite','nav.qa':'QA-Terminal','nav.ai':'KI in QA','nav.contact':'Kontakt',
+              'ctl.lang':'Sprache','ctl.text':'Textgröße','ctl.tts':'🔊 Seite vorlesen',
+              'st.h':'QA-Challenge','st.b':'Kannst du den Fehler reproduzieren und melden?' }
+    };
+    function setLang(l) {
+        const t = translations[l] || translations.en;
+        document.documentElement.lang = l;
+        document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (t[k] != null) el.textContent = t[k]; });
+        try { localStorage.setItem('lang', l); } catch (e) {}
+        const s = document.getElementById('langSelect'); if (s) s.value = l;
+    }
+    function updateDys() { const el = document.getElementById('dysToggle'); if (el) el.textContent = document.body.classList.contains('dyslexic') ? 'Dyslexia-friendly text: On' : 'Dyslexia-friendly text: Off'; }
+    function toggleDyslexia() { const on = document.body.classList.toggle('dyslexic'); try { localStorage.setItem('dyslexic', on ? '1' : '0'); } catch (e) {} updateDys(); }
+    let zoom = 1;
+    function applyZoom() { document.documentElement.style.zoom = zoom; try { localStorage.setItem('zoom', String(zoom)); } catch (e) {} }
+    function zoomStep(d) { zoom = Math.min(1.6, Math.max(0.8, +(zoom + d * 0.1).toFixed(2))); applyZoom(); }
+    function zoomReset() { zoom = 1; applyZoom(); }
+    function toggleTTS() {
+        const sy = window.speechSynthesis; if (!sy) return;
+        if (sy.speaking) { sy.cancel(); return; }
+        const parts = [];
+        document.querySelectorAll('.sticky, #term-out').forEach(el => {
+            if (!el.closest('.menu')) { const t = (el.innerText || '').trim(); if (t) parts.push(t); }
+        });
+        sy.speak(new SpeechSynthesisUtterance(parts.join('. ') || document.body.innerText));
+    }
+    (function () {
+        try {
+            const l = localStorage.getItem('lang'); if (l) setLang(l);
+            if (localStorage.getItem('dyslexic') === '1') document.body.classList.add('dyslexic');
+            const z = parseFloat(localStorage.getItem('zoom')); if (z) { zoom = z; applyZoom(); }
+        } catch (e) {}
+        updateDys();
+    })();
     </script>
 </body>
 </html>
