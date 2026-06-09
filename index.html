@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quality Assurance at Total Onion — how we keep every layer flawless, from user journeys to test coverage.">
     <title>Total Onion — QA Practice</title>
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/opendyslexic">
     <style>
         :root {
             --bg: #ffffff;
@@ -17,7 +18,7 @@
         html { background: var(--bg); }
         body {
             margin: 0;
-            padding: 96px 48px 48px;
+            padding: 128px 48px 48px;
             background: transparent;
             color: var(--ink);
             font: 16px/1.6 "Helvetica Neue", Arial, sans-serif;
@@ -44,7 +45,7 @@
         /* Age gate */
         .gate {
             position: fixed; inset: 0;
-            background: rgba(255,255,255,.96);
+            background: transparent;                 /* let the animated code background show behind the gate */
             display: grid; place-items: center;
             z-index: 9999;
         }
@@ -156,8 +157,18 @@
         }
         .menu a { display: block; padding: 8px 0; }
 
+        /* Main content column — fills the screen and spreads content evenly top→bottom */
+        .page { min-height: calc(100vh - 176px); display: flex; flex-direction: column; justify-content: space-between; }
+        .hero { max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* Hide all page content until the age gate is passed — only the animated background shows behind the gate */
+        .page { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+        .site-logo, .menu-btn { opacity: 0; transition: opacity .6s ease; }
+        body.entered .page { opacity: 1; transform: translateY(0); }
+        body.entered .site-logo, body.entered .menu-btn { opacity: 1; }
+
         /* QA team section */
-        .qa-section { max-width: 900px; margin: 48px auto 0; }
+        .qa-section { max-width: 1400px; margin: 0 auto; width: 100%; }
         .label {
             display: flex; align-items: center; gap: 14px;
             text-transform: uppercase; letter-spacing: 2px;
@@ -166,8 +177,17 @@
         }
         .label::before, .label::after { content: ""; height: 1px; background: var(--line); flex: 1; }
         .qa-intro { color: var(--muted); max-width: 640px; margin: 0 auto 28px; text-align: center; }
-        .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .qa-card { border: 1px solid var(--line); background: #fff; padding: 24px; }
+        .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; }
+        .qa-card {
+            border: 1px solid var(--line); background: #fff; padding: 32px;
+            position: relative;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .qa-card:hover {
+            transform: translateY(-8px) scale(1.03);   /* pops out on hover */
+            box-shadow: 0 16px 40px rgba(0,0,0,.18);
+            z-index: 1;
+        }
         .qa-photo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; display: block; margin-bottom: 16px; background: #eee; }
         .qa-card blockquote { margin: 0 0 16px; font-size: 16px; line-height: 1.6; }
         .qa-card .qa-name { font-weight: 700; font-size: 14px; }
@@ -175,7 +195,7 @@
         .qa-card .qa-role { color: var(--muted); font-size: 13px; margin-top: 2px; }
 
         /* Careers call-to-action */
-        .cta { text-align: center; margin: 56px auto 24px; }
+        .cta { text-align: center; margin: 0 auto 24px; }
         .cta a {
             display: inline-block;
             background: #000; color: #fff;
@@ -194,6 +214,58 @@
             height: auto;
             z-index: 10000;    /* sits on top of everything, even the age gate */
         }
+
+        /* Dyslexia-friendly mode (toggled from the menu) */
+        body.dyslexic {
+            font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
+            letter-spacing: 0.04em;
+            word-spacing: 0.14em;
+            line-height: 1.9;
+        }
+
+        /* Accessibility & language controls in the menu */
+        .menu__controls { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 10px; }
+        .menu__controls label {
+            display: block; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 1px; color: #999; margin: 8px 0 4px;
+        }
+        .menu__controls select {
+            width: 100%; padding: 8px; border: 1px solid var(--accent);
+            background: #fff; color: var(--ink); border-radius: 0; font-size: 14px;
+        }
+        .menu__controls .toggle-link { cursor: pointer; }
+        .menu__controls .textsize-row { display: flex; gap: 6px; margin-top: 2px; }
+        .menu__controls .textsize-row button {
+            flex: 1; padding: 6px; border: 1px solid var(--accent);
+            background: #fff; color: var(--ink); border-radius: 0; cursor: pointer; font-weight: 700;
+        }
+
+        /* High-contrast theme (yellow on black) */
+        body.hc { background: #0a0a0a; --ink: #ffeb3b; --accent: #ffeb3b; --muted: #e7e36a; --line: #555; }
+        body.hc #bg-code { display: none; }
+        body.hc .qa-card, body.hc .gate__box, body.hc .menu, body.hc .cookies,
+        body.hc .menu__controls select, body.hc .menu__controls .textsize-row button { background: #0a0a0a; color: #ffeb3b; }
+        body.hc h1, body.hc p, body.hc a, body.hc blockquote,
+        body.hc .qa-name, body.hc .qa-role, body.hc .label, body.hc .qa-intro { color: #ffeb3b !important; }
+        body.hc .cta a { background: #ffeb3b; color: #000; border-color: #ffeb3b; }
+
+        /* Dark theme */
+        body.dark { background: #111; --ink: #e8e8e8; --accent: #ffffff; --muted: #a0a0a0; --line: #333; }
+        body.dark #bg-code { display: none; }
+        body.dark .qa-card, body.dark .gate__box, body.dark .menu, body.dark .cookies,
+        body.dark .menu__controls select, body.dark .menu__controls .textsize-row button { background: #1a1a1a; color: #e8e8e8; }
+        body.dark h1, body.dark p, body.dark a, body.dark blockquote,
+        body.dark .qa-name, body.dark .qa-role, body.dark .label, body.dark .qa-intro { color: #e8e8e8 !important; }
+        body.dark .cta a { background: #fff; color: #000; }
+
+        /* Mobile / narrow screens — stop the cards overflowing and trim the side padding */
+        @media (max-width: 600px) {
+            body { padding: 90px 20px 32px; }
+            h1 { font-size: 30px; }
+            .qa-grid { grid-template-columns: 1fr; gap: 18px; }   /* stack the cards in one column */
+            .qa-card { padding: 22px; }
+            .page { min-height: calc(100vh - 122px); }
+        }
     </style>
 </head>
 <body>
@@ -204,42 +276,72 @@
 <!-- Burger menu (top-left) -->
 <button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
 <nav class="menu" id="menu">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="products.html">Our Services</a>
-    <a href="contact.html">Contact us</a>
-    <a href="#" onclick="resetCookies(); return false;">Reset cookie choice (for QA testing)</a>
+    <a href="index.html" data-i18n="nav.home">Home</a>
+    <a href="about.html" data-i18n="nav.about">About</a>
+    <a href="products.html" data-i18n="nav.services">Our Services</a>
+    <a href="contact.html" data-i18n="nav.contact">Contact us</a>
+    <a href="#" onclick="resetCookies(); return false;" data-i18n="nav.reset">Reset cookie choice (for QA testing)</a>
     <span style="display:block; font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; padding:10px 0 4px;">Total Onion live</span>
     <a href="https://totalonion.com/" target="_blank" rel="noopener">Home</a>
     <a href="https://totalonion.com/services/" target="_blank" rel="noopener">Services</a>
     <a href="https://totalonion.com/case-studies/" target="_blank" rel="noopener">Case studies</a>
     <a href="https://totalonion.com/careers/" target="_blank" rel="noopener">Careers</a>
     <a href="https://totalonion.com/blog/" target="_blank" rel="noopener">Blog</a>
+
+    <div class="menu__controls">
+        <label for="langSelect" data-i18n="ctrl.language">Language</label>
+        <select id="langSelect" onchange="setLang(this.value)" aria-label="Choose language">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+        </select>
+        <a href="#" class="toggle-link" id="dysToggle" onclick="toggleDyslexia(); return false;">Dyslexia-friendly text: Off</a>
+
+        <label for="themeSelect">Colour theme</label>
+        <select id="themeSelect" onchange="setTheme(this.value)" aria-label="Colour theme">
+            <option value="default">Default</option>
+            <option value="contrast">High contrast (yellow on black)</option>
+            <option value="dark">Dark</option>
+        </select>
+
+        <label>Text size</label>
+        <div class="textsize-row">
+            <button type="button" onclick="zoomStep(-1)" aria-label="Decrease text size">A&minus;</button>
+            <button type="button" onclick="zoomReset()" aria-label="Reset text size">A</button>
+            <button type="button" onclick="zoomStep(1)" aria-label="Increase text size">A+</button>
+        </div>
+
+        <a href="#" class="toggle-link" id="ttsToggle" onclick="toggleReadAloud(); return false;">&#128266; Read page aloud</a>
+    </div>
 </nav>
 
 <!-- Age gate -->
 <div class="gate" id="gate">
     <div class="gate__box">
-        <h2>Are you old enough?</h2>
-        <p>You'll need to be 18 or over to peel back the layers.</p>
+        <h2 data-i18n="gate.h2">Are you old enough?</h2>
+        <p data-i18n="gate.p">You'll need to be 18 or over to peel back the layers.</p>
         <div class="gate__inputs">
             <input id="dd" maxlength="2" placeholder="DD" inputmode="numeric" aria-label="Day of birth">
             <input id="mm" maxlength="2" placeholder="MM" inputmode="numeric" aria-label="Month of birth">
             <input id="yyyy" maxlength="4" class="yr" placeholder="YYYY" inputmode="numeric" aria-label="Year of birth">
         </div>
-        <button class="gate__btn" onclick="verifyAge()">Let me in</button>
+        <button class="gate__btn" onclick="verifyAge()" data-i18n="gate.btn">Let me in</button>
         <p class="gate__error" id="err"></p>
     </div>
 </div>
 
 <!-- Page content -->
-<h1>Quality Assurance at Total Onion</h1>
-<p>How we keep every layer flawless: we pair innovation with practical solutions, applying modern QA skills and tools to deliver first-class quality. We don&rsquo;t see a website as a straightforward path &mdash; we see an expanding root system, covering everything from user accessibility to the key structured pages that guide people to what they need.</p>
+<main class="page">
+<header class="hero">
+<h1 data-i18n="hero.h1">Quality Assurance at Total Onion</h1>
+<p data-i18n="hero.p">How we keep every layer flawless: we pair innovation with practical solutions, applying modern QA skills and tools to deliver first-class quality. We don&rsquo;t see a website as a straightforward path &mdash; we see an expanding root system, covering everything from user accessibility to the key structured pages that guide people to what they need.</p>
+</header>
 
 <!-- QA team section -->
 <section class="qa-section">
-    <div class="label">Life in QA at Total Onion</div>
-    <p class="qa-intro">
+    <div class="label" data-i18n="qa.label">Life in QA at Total Onion</div>
+    <p class="qa-intro" data-i18n="qa.intro">
         Our QA engineers are part of the projects from day one, working closely with devs, marketing,
         and brand &mdash; pulling requirements out of designs, shaping test coverage, and shipping with
         confidence. Here&rsquo;s what a few of them say about testing at Total Onion.
@@ -247,35 +349,36 @@
     <div class="qa-grid">
         <div class="qa-card">
             <img class="qa-photo" src="arron.jpg" alt="Arron Canning">
-            <blockquote>&ldquo;Three years ago I took a leap of faith and started a QA internship with Total Onion. From the get-go I was welcomed by the team, learning head-first about QA and how to understand URLs. It&rsquo;s so rewarding to learn as you work &mdash; your progress and your decision-making get sharper over time. If you&rsquo;re looking for perfection and innovation, then QA may be the role for you.&rdquo;</blockquote>
+            <blockquote data-i18n="qa.arron">&ldquo;Three years ago I took a leap of faith and started a QA internship with Total Onion. From the get-go I was welcomed by the team, learning head-first about QA and how to understand URLs. It&rsquo;s so rewarding to learn as you work &mdash; your progress and your decision-making get sharper over time. If you&rsquo;re looking for perfection and innovation, then QA may be the role for you.&rdquo;</blockquote>
             <div class="qa-name">Arron Canning <span class="qa-handle">(Sa1ntac)</span></div>
-            <div class="qa-role">QA Engineer</div>
+            <div class="qa-role" data-i18n="role.engineer">QA Engineer</div>
         </div>
         <div class="qa-card">
             <img class="qa-photo" src="https://placehold.co/72x72?text=JS" alt="James Stott">
-            <blockquote>Will add if consent is given by respected member.</blockquote>
+            <blockquote data-i18n="qa.james">Will add if consent is given by respected member.</blockquote>
             <div class="qa-name">James Stott</div>
-            <div class="qa-role">QA Lead</div>
+            <div class="qa-role" data-i18n="role.lead">QA Lead</div>
         </div>
     </div>
 </section>
 
 <!-- Careers CTA -->
 <section class="cta">
-    <a href="https://totalonion.com/careers/" target="_blank" rel="noopener">View careers at Total Onion</a>
+    <a href="https://totalonion.com/careers/" target="_blank" rel="noopener" data-i18n="cta">View careers at Total Onion</a>
 </section>
+</main>
 
 <!-- Cookie banner -->
 <div class="cookies" id="cookies" style="display:none">
-    <h3 class="cookies__title">We use cookies</h3>
-    <p class="cookies__text">
+    <h3 class="cookies__title" data-i18n="cookies.title">We use cookies</h3>
+    <p class="cookies__text" data-i18n="cookies.text">
         Total Onion uses cookies to make this site work and to understand how you use it.
         You're in charge — pick what you're happy with.
     </p>
     <div class="cookies__row">
-        <button class="cookies__btn cookies__btn--accept" onclick="acceptAll()">Accept all</button>
-        <button class="cookies__btn cookies__btn--reject" onclick="rejectAll()">Reject all</button>
-        <button class="cookies__btn cookies__btn--custom" onclick="togglePanel()">Customise</button>
+        <button class="cookies__btn cookies__btn--accept" onclick="acceptAll()" data-i18n="cookies.accept">Accept all</button>
+        <button class="cookies__btn cookies__btn--reject" onclick="rejectAll()" data-i18n="cookies.reject">Reject all</button>
+        <button class="cookies__btn cookies__btn--custom" onclick="togglePanel()" data-i18n="cookies.custom">Customise</button>
     </div>
     <div class="cookies__panel" id="cookiePanel">
         <div class="cookies__option">
@@ -337,7 +440,9 @@ function verifyAge() {
     if (age >= 18) {
         sessionStorage.setItem('ageVerified', '1');  // remember for THIS session only — cleared when the browser/tab closes
         document.getElementById('gate').remove();
+        document.body.classList.add('entered');   // fade the whole page in
         showCookiesIfNeeded();
+        codeRevealHero();
     } else {
         const eligible = new Date(yyyy + 18, mm - 1, dd);     // the day they turn 18
         localStorage.setItem('ageFailed', '1');               // remember the fail so a refresh can't escape
@@ -455,6 +560,176 @@ function toggleMenu() {
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
+/* --- Language switcher (i18n) --- */
+const translations = {
+  en: {
+    'nav.home': 'Home', 'nav.about': 'About', 'nav.services': 'Our Services', 'nav.contact': 'Contact us',
+    'nav.reset': 'Reset cookie choice (for QA testing)', 'ctrl.language': 'Language',
+    'hero.h1': 'Quality Assurance at Total Onion',
+    'hero.p': `How we keep every layer flawless: we pair innovation with practical solutions, applying modern QA skills and tools to deliver first-class quality. We don’t see a website as a straightforward path — we see an expanding root system, covering everything from user accessibility to the key structured pages that guide people to what they need.`,
+    'qa.label': 'Life in QA at Total Onion',
+    'qa.intro': `Our QA engineers are part of the projects from day one, working closely with devs, marketing, and brand — pulling requirements out of designs, shaping test coverage, and shipping with confidence. Here’s what a few of them say about testing at Total Onion.`,
+    'qa.arron': `“Three years ago I took a leap of faith and started a QA internship with Total Onion. From the get-go I was welcomed by the team, learning head-first about QA and how to understand URLs. It’s so rewarding to learn as you work — your progress and your decision-making get sharper over time. If you’re looking for perfection and innovation, then QA may be the role for you.”`,
+    'qa.james': 'Will add if consent is given by respected member.',
+    'role.engineer': 'QA Engineer', 'role.lead': 'QA Lead',
+    'cta': 'View careers at Total Onion',
+    'cookies.title': 'We use cookies',
+    'cookies.text': `Total Onion uses cookies to make this site work and to understand how you use it. You’re in charge — pick what you’re happy with.`,
+    'cookies.accept': 'Accept all', 'cookies.reject': 'Reject all', 'cookies.custom': 'Customise',
+    'gate.h2': 'Are you old enough?', 'gate.p': `You’ll need to be 18 or over to peel back the layers.`, 'gate.btn': 'Let me in'
+  },
+  fr: {
+    'nav.home': 'Accueil', 'nav.about': 'À propos', 'nav.services': 'Nos services', 'nav.contact': 'Contactez-nous',
+    'nav.reset': 'Réinitialiser le choix des cookies (pour les tests QA)', 'ctrl.language': 'Langue',
+    'hero.h1': 'Assurance qualité chez Total Onion',
+    'hero.p': `Comment nous gardons chaque couche irréprochable : nous associons l’innovation à des solutions concrètes, en appliquant des compétences et des outils QA modernes pour offrir une qualité de premier ordre. Nous ne voyons pas un site web comme un chemin linéaire — mais comme un système racinaire qui s’étend, couvrant tout, de l’accessibilité aux pages structurées qui guident les visiteurs vers ce dont ils ont besoin.`,
+    'qa.label': 'La vie en QA chez Total Onion',
+    'qa.intro': `Nos ingénieurs QA font partie des projets dès le premier jour, en collaboration étroite avec les développeurs, le marketing et la marque — en extrayant les exigences des maquettes, en façonnant la couverture de tests et en livrant en toute confiance. Voici ce qu’en disent quelques-uns sur les tests chez Total Onion.`,
+    'qa.arron': `« Il y a trois ans, j’ai pris un risque et commencé un stage QA chez Total Onion. Dès le départ, l’équipe m’a accueilli, et j’ai appris le QA et la compréhension des URL sur le terrain. C’est tellement gratifiant d’apprendre en travaillant — vos progrès et vos décisions s’affinent avec le temps. Si vous recherchez la perfection et l’innovation, le QA est peut-être le rôle qu’il vous faut. »`,
+    'qa.james': 'À ajouter si le membre concerné donne son accord.',
+    'role.engineer': 'Ingénieur QA', 'role.lead': 'Responsable QA',
+    'cta': 'Voir les carrières chez Total Onion',
+    'cookies.title': 'Nous utilisons des cookies',
+    'cookies.text': `Total Onion utilise des cookies pour faire fonctionner ce site et comprendre comment vous l’utilisez. C’est vous qui décidez — choisissez ce qui vous convient.`,
+    'cookies.accept': 'Tout accepter', 'cookies.reject': 'Tout refuser', 'cookies.custom': 'Personnaliser',
+    'gate.h2': 'Avez-vous l’âge requis ?', 'gate.p': `Vous devez avoir 18 ans ou plus pour découvrir les coulisses.`, 'gate.btn': 'Entrer'
+  },
+  es: {
+    'nav.home': 'Inicio', 'nav.about': 'Acerca de', 'nav.services': 'Nuestros servicios', 'nav.contact': 'Contáctanos',
+    'nav.reset': 'Restablecer elección de cookies (para pruebas QA)', 'ctrl.language': 'Idioma',
+    'hero.h1': 'Aseguramiento de calidad en Total Onion',
+    'hero.p': `Cómo mantenemos cada capa impecable: combinamos innovación con soluciones prácticas, aplicando habilidades y herramientas de QA modernas para ofrecer una calidad de primer nivel. No vemos un sitio web como un camino lineal, sino como un sistema de raíces en expansión, que abarca desde la accesibilidad hasta las páginas estructuradas clave que guían a las personas hacia lo que necesitan.`,
+    'qa.label': 'La vida en QA en Total Onion',
+    'qa.intro': `Nuestros ingenieros de QA forman parte de los proyectos desde el primer día, trabajando estrechamente con desarrolladores, marketing y marca: extrayendo requisitos de los diseños, dando forma a la cobertura de pruebas y lanzando con confianza. Esto es lo que algunos dicen sobre las pruebas en Total Onion.`,
+    'qa.arron': `«Hace tres años di un salto de fe y comencé unas prácticas de QA en Total Onion. Desde el principio, el equipo me acogió, y aprendí de lleno sobre QA y cómo entender las URL. Es muy gratificante aprender mientras trabajas: tu progreso y tu toma de decisiones se afinan con el tiempo. Si buscas perfección e innovación, QA puede ser el puesto para ti.»`,
+    'qa.james': 'Se añadirá si el miembro correspondiente da su consentimiento.',
+    'role.engineer': 'Ingeniero de QA', 'role.lead': 'Líder de QA',
+    'cta': 'Ver empleos en Total Onion',
+    'cookies.title': 'Usamos cookies',
+    'cookies.text': `Total Onion usa cookies para que este sitio funcione y para entender cómo lo usas. Tú decides: elige lo que prefieras.`,
+    'cookies.accept': 'Aceptar todo', 'cookies.reject': 'Rechazar todo', 'cookies.custom': 'Personalizar',
+    'gate.h2': '¿Tienes la edad suficiente?', 'gate.p': `Debes tener 18 años o más para descubrir lo que hay dentro.`, 'gate.btn': 'Entrar'
+  },
+  de: {
+    'nav.home': 'Startseite', 'nav.about': 'Über uns', 'nav.services': 'Unsere Leistungen', 'nav.contact': 'Kontakt',
+    'nav.reset': 'Cookie-Auswahl zurücksetzen (für QA-Tests)', 'ctrl.language': 'Sprache',
+    'hero.h1': 'Qualitätssicherung bei Total Onion',
+    'hero.p': `Wie wir jede Schicht makellos halten: Wir verbinden Innovation mit praktischen Lösungen und setzen moderne QA-Fähigkeiten und -Werkzeuge ein, um erstklassige Qualität zu liefern. Wir sehen eine Website nicht als geraden Weg — sondern als ein sich ausbreitendes Wurzelsystem, das alles abdeckt, von der Barrierefreiheit bis zu den zentralen strukturierten Seiten, die Menschen zu dem führen, was sie brauchen.`,
+    'qa.label': 'QA-Alltag bei Total Onion',
+    'qa.intro': `Unsere QA-Ingenieure sind von Tag eins Teil der Projekte und arbeiten eng mit Entwicklern, Marketing und Marke zusammen — sie leiten Anforderungen aus Designs ab, gestalten die Testabdeckung und liefern mit Zuversicht. Hier ist, was einige von ihnen über das Testen bei Total Onion sagen.`,
+    'qa.arron': `„Vor drei Jahren wagte ich den Sprung und begann ein QA-Praktikum bei Total Onion. Von Anfang an wurde ich vom Team aufgenommen und lernte QA und das Verständnis von URLs aus erster Hand. Es ist so lohnend, beim Arbeiten zu lernen — dein Fortschritt und deine Entscheidungen werden mit der Zeit schärfer. Wenn du Perfektion und Innovation suchst, könnte QA die richtige Rolle für dich sein."`,
+    'qa.james': 'Wird ergänzt, sofern das betreffende Mitglied zustimmt.',
+    'role.engineer': 'QA-Ingenieur', 'role.lead': 'QA-Leiter',
+    'cta': 'Karriere bei Total Onion ansehen',
+    'cookies.title': 'Wir verwenden Cookies',
+    'cookies.text': `Total Onion verwendet Cookies, damit diese Website funktioniert und um zu verstehen, wie Sie sie nutzen. Sie haben die Wahl — entscheiden Sie, was Ihnen recht ist.`,
+    'cookies.accept': 'Alle akzeptieren', 'cookies.reject': 'Alle ablehnen', 'cookies.custom': 'Anpassen',
+    'gate.h2': 'Bist du alt genug?', 'gate.p': `Du musst 18 oder älter sein, um hinter die Kulissen zu blicken.`, 'gate.btn': 'Eintreten'
+  }
+};
+
+function setLang(lang) {
+    const dict = translations[lang] || translations.en;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key] != null) el.textContent = dict[key];
+    });
+    document.documentElement.setAttribute('lang', lang);
+    localStorage.setItem('lang', lang);
+    const sel = document.getElementById('langSelect');
+    if (sel) sel.value = lang;
+}
+
+/* --- Dyslexia-friendly text toggle --- */
+function updateDysLabel(on) {
+    const link = document.getElementById('dysToggle');
+    if (link) link.textContent = 'Dyslexia-friendly text: ' + (on ? 'On' : 'Off');
+}
+function toggleDyslexia() {
+    const on = document.body.classList.toggle('dyslexic');
+    localStorage.setItem('dyslexic', on ? '1' : '0');
+    updateDysLabel(on);
+}
+
+/* --- Code-style "decode" reveal for the hero text (matches the code background) --- */
+function scrambleEl(el, duration) {
+    const target = el.textContent;
+    const glyphs = '01{}[]()<>/=;:+-*&|!?$#abcdefgh'.split('');
+    const win = 4;                 // width of the "decoding" head
+    const start = performance.now();
+    el.textContent = '';           // start blank, then write the text in
+    function frame(now) {
+        const p = Math.min(1, (now - start) / duration);
+        const reveal = Math.floor(p * target.length);
+        let out = '';
+        for (let i = 0; i < target.length; i++) {
+            const ch = target[i];
+            if (i < reveal) out += ch;                               // settled text
+            else if (i < reveal + win && ch !== ' ' && ch !== '\n')  // decoding head
+                out += glyphs[Math.floor(Math.random() * glyphs.length)];
+            else if (ch === '\n') out += '\n';                       // keep line breaks
+            // otherwise: not written yet (blank)
+        }
+        el.textContent = out;
+        if (p < 1) requestAnimationFrame(frame);
+        else el.textContent = target;
+    }
+    requestAnimationFrame(frame);
+}
+function codeRevealHero() {
+    const h1 = document.querySelector('[data-i18n="hero.h1"]');
+    const intro = document.querySelector('[data-i18n="hero.p"]');
+    if (h1) scrambleEl(h1, 700);
+    if (intro) scrambleEl(intro, 1200);
+}
+
+/* --- Read aloud (browser text-to-speech, fully local, no external service) --- */
+function getReadableText() {
+    const sels = ['[data-i18n="hero.h1"]','[data-i18n="hero.p"]','.qa-intro','.qa-card blockquote','.qa-name','.qa-role','[data-i18n="cta"]'];
+    const parts = [];
+    sels.forEach(s => document.querySelectorAll(s).forEach(e => { const t = e.textContent.trim(); if (t) parts.push(t); }));
+    return parts.join('. ');
+}
+function toggleReadAloud() {
+    const synth = window.speechSynthesis;
+    const link = document.getElementById('ttsToggle');
+    if (!synth) { if (link) link.textContent = 'Read-aloud not supported'; return; }
+    if (synth.speaking) { synth.cancel(); if (link) link.innerHTML = '&#128266; Read page aloud'; return; }
+    const u = new SpeechSynthesisUtterance(getReadableText());
+    u.lang = localStorage.getItem('lang') || 'en';
+    u.onend = () => { if (link) link.innerHTML = '&#128266; Read page aloud'; };
+    synth.speak(u);
+    if (link) link.innerHTML = '&#9209; Stop reading';
+}
+
+/* --- Text size / zoom --- */
+let zoom = 1;
+function applyZoom() { document.documentElement.style.zoom = zoom; localStorage.setItem('zoom', String(zoom)); }
+function zoomStep(dir) { zoom = Math.min(1.6, Math.max(0.8, +(zoom + dir * 0.1).toFixed(2))); applyZoom(); }
+function zoomReset() { zoom = 1; applyZoom(); }
+
+/* --- Colour theme (incl. high-contrast for low vision / colour preference) --- */
+function setTheme(t) {
+    document.body.classList.remove('hc', 'dark');
+    if (t === 'contrast') document.body.classList.add('hc');
+    else if (t === 'dark') document.body.classList.add('dark');
+    document.documentElement.style.background = t === 'contrast' ? '#0a0a0a' : (t === 'dark' ? '#111' : '');
+    localStorage.setItem('theme', t);
+    const sel = document.getElementById('themeSelect');
+    if (sel) sel.value = t;
+}
+
+/* Apply saved preferences on load */
+(function applyPrefs() {
+    setLang(localStorage.getItem('lang') || 'en');
+    const dys = localStorage.getItem('dyslexic') === '1';
+    if (dys) document.body.classList.add('dyslexic');
+    updateDysLabel(dys);
+    zoom = parseFloat(localStorage.getItem('zoom')) || 1;
+    applyZoom();
+    setTheme(localStorage.getItem('theme') || 'default');
+})();
+
 /* On load:
    - if they failed earlier, keep them blocked (refresh can't escape)
    - else if they passed earlier THIS session, skip the gate (until the browser/tab is closed) */
@@ -463,7 +738,9 @@ if (localStorage.getItem('ageFailed')) {
 } else if (sessionStorage.getItem('ageVerified')) {
     const g = document.getElementById('gate');
     if (g) g.remove();
+    document.body.classList.add('entered');   // fade the whole page in
     showCookiesIfNeeded();
+    codeRevealHero();
 }
 </script>
 
