@@ -196,9 +196,10 @@
 
         /* Tools-we-use logo strip (above the QA label) */
         .tools { display: flex; justify-content: center; align-items: center; gap: 34px; flex-wrap: wrap; margin: 0 0 34px; }
-        .tools img { height: 34px; width: auto; opacity: .55; transition: opacity .2s ease; }
-        .tools img:hover { opacity: 1; }
-        body.dark .tools img, body.hc .tools img { filter: invert(1); }   /* flip to white on dark themes */
+        .tools img { height: 34px; width: auto; opacity: .55; filter: grayscale(1); transition: opacity .2s ease, filter .2s ease; }
+        .tools img:hover { opacity: 1; filter: grayscale(0); }   /* full colour on hover */
+        body.dark .tools img, body.hc .tools img { filter: grayscale(1) invert(1); }   /* light monochrome on dark themes */
+        body.dark .tools img:hover, body.hc .tools img:hover { filter: grayscale(0); }
 
         /* "Meet the QA team" sub-heading */
         .qa-subhead { text-align: center; font-size: 22px; font-weight: 800; color: var(--accent); margin: 32px 0 22px; }
@@ -350,11 +351,11 @@
 <!-- QA team section -->
 <section class="qa-section">
     <div class="tools" aria-label="Tools we use">
-        <img src="https://cdn.simpleicons.org/visualstudiocode/111111" alt="Visual Studio Code">
-        <img src="https://cdn.simpleicons.org/docker/111111" alt="Docker">
-        <img src="https://cdn.simpleicons.org/figma/111111" alt="Figma">
-        <img src="https://cdn.simpleicons.org/jira/111111" alt="Jira">
-        <img src="https://cdn.simpleicons.org/git/111111" alt="Git">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="Visual Studio Code">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg" alt="Jira">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git">
     </div>
     <div class="label" data-i18n="qa.label">Life in QA at Total Onion</div>
     <p class="qa-intro" data-i18n="qa.intro">
