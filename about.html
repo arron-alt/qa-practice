@@ -3,34 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="About Total Onion — a little about this QA practice site, built by Arron.">
-    <title>About — Total Onion</title>
+    <meta name="description" content="About Total Onion — try the QA terminal: reproduce a real-world bug and file it.">
+    <title>About — Total Onion QA Terminal</title>
     <style>
+        :root { --accent: #00968f; }
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; }
         body {
-            background-color: #ffffff;
-            color: #111111;
             font-family: "Helvetica Neue", Arial, sans-serif;
-            padding: 96px 48px 48px;
+            color: #111;
+            overflow: hidden;
         }
-        h1 {
-            color: #000000;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        a {
-            color: #000000;
-        }
+
+        /* ---------- header / burger menu (consistent across pages) ---------- */
         .site-logo { position: fixed; top: 20px; left: 20px; width: 50px; height: auto; z-index: 10000; }
-        .menu-btn { position: fixed; top: 25px; right: 20px; z-index: 200; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 30px; line-height: 1; padding: 0; background: none; border: none; color: #000; cursor: pointer; transition: transform .25s ease; }
+        .menu-btn { position: fixed; top: 25px; right: 20px; z-index: 300; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 30px; line-height: 1; padding: 0; background: none; border: none; color: #fff; cursor: pointer; transition: transform .25s ease; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
         .menu-btn.is-open { transform: rotate(90deg); }
         .menu {
-            position: fixed; top: 60px; right: 20px; z-index: 200; min-width: 230px;
+            position: fixed; top: 60px; right: 20px; z-index: 300; min-width: 230px;
             background: #fff; border: 1px solid #000; padding: 12px 18px;
             opacity: 0; visibility: hidden; transform: translateY(-8px);
             transition: opacity .25s ease, transform .25s ease, visibility .25s;
         }
         .menu.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
-        .menu a { display: block; padding: 8px 0; }
+        .menu a { display: block; padding: 8px 0; color: #000; text-decoration: none; }
+        .menu a:hover { color: var(--accent); }
+
+        /* ---------- office scene ---------- */
+        .office { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+        .wall {
+            position: absolute; inset: 0 0 34% 0;
+            background:
+              radial-gradient(120% 90% at 50% 0%, #e7ebee 0%, #d2d9de 55%, #c2cbd1 100%);
+        }
+        .baseboard { position: absolute; left: 0; right: 0; bottom: 34%; height: 10px; background: #b3bcc2; box-shadow: 0 1px 0 #9aa4ab; }
+        .desk {
+            position: absolute; left: 0; right: 0; bottom: 0; height: 34%;
+            background: linear-gradient(180deg, #6f5743 0%, #5d4836 6%, #6b5340 7%, #5a4634 100%);
+            box-shadow: inset 0 8px 18px rgba(0,0,0,.25);
+        }
+        .desk::before { content:""; position:absolute; top:0; left:0; right:0; height:7px; background: linear-gradient(#caa57e,#9c7a58); }
+
+        /* window with subtle skyline */
+        .window {
+            position: absolute; top: 9%; left: 6%; width: 230px; height: 150px;
+            background: linear-gradient(180deg,#bfe0ef 0%, #d8eef6 60%, #eaf6fb 100%);
+            border: 10px solid #e8edf0; border-radius: 4px; box-shadow: 0 6px 18px rgba(0,0,0,.12);
+        }
+        .window::before { /* skyline */
+            content:""; position:absolute; left:0; right:0; bottom:0; height:58%;
+            background:
+              linear-gradient(90deg, #9fb3bd 0 18px, transparent 18px 34px),
+              linear-gradient(90deg, transparent 0 34px, #8ea6b1 34px 64px, transparent 64px),
+              linear-gradient(90deg, transparent 0 70px, #a7bac4 70px 96px, transparent 96px),
+              linear-gradient(90deg, transparent 0 110px, #8ea6b1 110px 150px, transparent 150px),
+              linear-gradient(90deg, transparent 0 158px, #9fb3bd 158px 196px, transparent 196px);
+            background-repeat:no-repeat; opacity:.85;
+        }
+        .window::after { content:""; position:absolute; inset:0; background:
+              linear-gradient(#e8edf0,#e8edf0) center/6px 100% no-repeat,
+              linear-gradient(#e8edf0,#e8edf0) center/100% 6px no-repeat; }
+
+        /* desk plant */
+        .plant { position:absolute; bottom:30%; right:7%; width:64px; height:90px; }
+        .plant .pot { position:absolute; bottom:0; left:8px; width:48px; height:38px; background:linear-gradient(#c66b4a,#a4502f); border-radius:4px 4px 8px 8px; }
+        .plant .leaf { position:absolute; bottom:30px; left:28px; width:14px; height:52px; background:var(--accent); border-radius:50% 50% 50% 50%/60% 60% 40% 40%; transform-origin:bottom center; opacity:.85; }
+        .plant .leaf.l2 { transform:rotate(35deg); } .plant .leaf.l3 { transform:rotate(-35deg); }
+        .plant .leaf.l4 { transform:rotate(18deg); height:44px;} .plant .leaf.l5 { transform:rotate(-18deg); height:44px;}
+
+        /* coffee mug */
+        .mug { position:absolute; bottom:31%; left:13%; width:42px; height:36px; background:#f3f3f3; border-radius:4px 4px 8px 8px; box-shadow:0 4px 8px rgba(0,0,0,.2);}
+        .mug::after { content:""; position:absolute; right:-12px; top:8px; width:14px; height:16px; border:4px solid #f3f3f3; border-left:none; border-radius:0 8px 8px 0;}
+        .mug::before { content:"QA"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:700 12px/1 Arial; color:var(--accent);}
+
+        /* sticky note */
+        .sticky { position:absolute; top:11%; right:9%; width:124px; height:118px; background:#ffe27a; transform:rotate(4deg); box-shadow:0 6px 14px rgba(0,0,0,.18); padding:12px; font:600 13px/1.3 "Comic Sans MS",Arial; color:#5b4a00; }
+        .sticky b { display:block; font-size:14px; margin-bottom:4px; }
+
+        /* ---------- monitor + terminal ---------- */
+        .monitor { position: absolute; left: 50%; top: 49%; transform: translate(-50%, -50%); width: min(720px, 90vw); z-index: 2; }
+        .bezel { background: #1b1e21; border: 1px solid #2c3034; border-radius: 14px; padding: 14px; box-shadow: 0 22px 48px rgba(0,0,0,.4); }
+        .cam { width: 6px; height: 6px; border-radius: 50%; background: #3a3f44; margin: 0 auto 8px; }
+        .screen {
+            background: #07100b; border-radius: 6px; height: min(52vh, 420px);
+            padding: 14px 16px; overflow-y: auto; position: relative; cursor: text;
+            font-family: "Consolas", "SF Mono", "Roboto Mono", monospace; font-size: 14px; line-height: 1.55; color: #c8f7d2;
+            box-shadow: inset 0 0 60px rgba(0,0,0,.6), inset 0 0 0 1px #16241b;
+        }
+        .screen::after { /* faint scanlines */
+            content:""; position:absolute; inset:0; pointer-events:none; border-radius:6px;
+            background: repeating-linear-gradient(rgba(0,0,0,0) 0 2px, rgba(0,0,0,.06) 2px 3px);
+        }
+        .line { white-space: pre-wrap; word-break: break-word; }
+        .sys  { color: #6f8f7b; }
+        .err  { color: #ff9a8c; }
+        .warn { color: #ffd27a; }
+        .win  { color: #5ef0a0; font-weight: 700; }
+        .echo { color: #9fe7c4; }
+        .echo .p { color: var(--accent); }
+        .input-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+        .input-row .p { color: var(--accent); white-space: nowrap; }
+        #term-in { flex: 1; background: transparent; border: none; outline: none; color: #c8f7d2; font: inherit; caret-color: #5ef0a0; }
+        .stand { width: 110px; height: 42px; margin: 0 auto; background: linear-gradient(#26292c, #14171a); clip-path: polygon(26% 0, 74% 0, 100% 100%, 0 100%); }
+        .base  { width: 190px; height: 13px; margin: -1px auto 0; background: #14171a; border-radius: 8px; box-shadow: 0 8px 14px rgba(0,0,0,.3); }
+
+        @media (max-width: 600px) {
+            .window, .plant, .mug, .sticky { display: none; }
+            .monitor { width: 94vw; top: 47%; }
+            .screen { font-size: 12.5px; height: 58vh; }
+        }
     </style>
 </head>
 <body>
@@ -38,7 +119,7 @@
     <button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
     <nav class="menu" id="menu">
         <a href="index.html">Home</a>
-        <a href="about.html">About</a>
+        <a href="about.html">QA Terminal</a>
         <a href="products.html">Our Services</a>
         <a href="contact.html">Contact us</a>
         <span style="display:block; font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; padding:10px 0 4px;">Total Onion live</span>
@@ -49,9 +130,30 @@
         <a href="https://totalonion.com/blog/" target="_blank" rel="noopener">Blog</a>
     </nav>
 
-    <h1>About This Page</h1>
-    <p>This is the second page of my QA practice site.</p>
-    <p>Built by Arron at Total Onion.</p>
+    <div class="office" aria-hidden="true">
+        <div class="wall"></div>
+        <div class="window"></div>
+        <div class="sticky"><b>QA challenge</b>Can you reproduce the bug and file it?</div>
+        <div class="baseboard"></div>
+        <div class="desk"></div>
+        <div class="mug"></div>
+        <div class="plant"><span class="leaf l1"></span><span class="leaf l2"></span><span class="leaf l3"></span><span class="leaf l4"></span><span class="leaf l5"></span><span class="pot"></span></div>
+    </div>
+
+    <div class="monitor">
+        <div class="bezel">
+            <div class="cam"></div>
+            <div class="screen" id="screen">
+                <div id="term-out"></div>
+                <div class="input-row" id="input-row">
+                    <span class="p">qa-trainee@totalonion:~$</span>
+                    <input id="term-in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input" disabled>
+                </div>
+            </div>
+        </div>
+        <div class="stand"></div>
+        <div class="base"></div>
+    </div>
 
     <script>
     function toggleMenu() {
@@ -60,10 +162,170 @@
         btn.classList.toggle('is-open');
         btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
+
+    // ---------- terminal QA game ----------
+    const out = document.getElementById('term-out');
+    const inp = document.getElementById('term-in');
+    const screen = document.getElementById('screen');
+    const inputRow = document.getElementById('input-row');
+
+    let step = 0, done = false, wrong = 0, score = 0, precise = 0;
+
+    const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ').replace(/^\//, '').replace(/^open \//, 'open ');
+
+    // Each entry = one user action. full: precise commands (full points) · loose: shorthand (partial credit)
+    // pts: points for the precise version · say: lines printed on success · hint: nudge on wrong input
+    const stages = [
+        { full: ['begin', 'start'], loose: [], pts: 0,
+          say: ['> Ticket QA-117 accepted.', '', 'STEP 1 / 4  —  Open the cart.', ['cmd', 'Type the full command:  open /cart']],
+          hint: 'Type  begin  to accept the ticket.' },
+        { full: ['open cart', 'open /cart'], loose: ['open'], pts: 25,
+          say: ['🛒 Cart opened — empty.   Total: £0.00', '', 'STEP 2 / 4  —  Add the 12 YO bottle (£20).', ['cmd', 'Type the full command:  add bottle']],
+          hint: 'Be precise — type the full command:  open /cart' },
+        { full: ['add bottle'], loose: ['add', 'add 12yo'], pts: 25,
+          say: ['Added: Glenlivet 12 YO  —  £20.00.   Total: £20.00', '', 'STEP 3 / 4  —  Apply discount code SAVE10.', ['cmd', 'Type the full command:  apply SAVE10']],
+          hint: 'Be precise — type the full command:  add bottle' },
+        { full: ['apply save10'], loose: ['apply'], pts: 25,
+          say: ['Code SAVE10 applied  (−£10.00).   Total: £10.00   ✓ looks correct…', '', ['cmd', 'STEP 4 / 4 — the real test: apply the SAME code again to check it is single-use.'], ['cmd', 'Type the full command:  apply SAVE10']],
+          hint: 'Be precise — type the full command:  apply SAVE10' },
+        { full: ['apply save10'], loose: ['apply'], pts: 25,
+          say: [['warn', '⚠ SAVE10 applied AGAIN  (−£10.00).   Total: £0.00'], ['err', '🐞 The code is NOT single-use — every re-apply keeps deducting (the total will go negative). Bug reproduced.'], '', 'FINAL  —  Log the defect.', ['cmd', 'Type the full command:  report bug']],
+          hint: 'Be precise — type the full command:  apply SAVE10' },
+        { full: ['report bug'], loose: ['report', 'file bug'], pts: 0,
+          say: ['__WIN__'],
+          hint: 'Type:  report bug' },
+    ];
+
+    function print(text, cls) {
+        const div = document.createElement('div');
+        div.className = 'line' + (cls ? ' ' + cls : '');
+        div.textContent = text;
+        out.appendChild(div);
+        screen.scrollTop = screen.scrollHeight;
+    }
+    function say(item) {
+        if (Array.isArray(item)) print(item[1], item[0] === 'cmd' ? 'sys' : item[0]);
+        else print(item);
+    }
+    function echo(raw) {
+        const div = document.createElement('div');
+        div.className = 'line echo';
+        div.innerHTML = '<span class="p">qa-trainee@totalonion:~$</span> ' + raw.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+        out.appendChild(div);
+    }
+    function link(text, href) {
+        const div = document.createElement('div'); div.className = 'line';
+        const a = document.createElement('a'); a.href = href; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = text; a.style.color = '#5ef0a0'; a.style.textDecoration = 'underline';
+        div.appendChild(a); out.appendChild(div); screen.scrollTop = screen.scrollHeight;
+    }
+    function help() {
+        print('Available commands:', 'sys');
+        print('  · follow the on-screen prompt and type the command shown', 'sys');
+        print('  · be PRECISE — full commands score more than shorthand', 'sys');
+        print('  · help     — show this', 'sys');
+        print('  · clear    — clear the screen', 'sys');
+        print('  · restart  — start the scenario again', 'sys');
+    }
+    function win() {
+        done = true;
+        print('', '');
+        print('Bug QA-117 filed.    Final score: ' + score + ' / 100     (' + precise + '/4 steps with precise wording)', 'win');
+        print('', '');
+        if (precise >= 4) {
+            print('╔══════════════════════════════════════╗', 'win');
+            print('║     ★   EXCELLENT  —  PERFECT RUN  ★    ║', 'win');
+            print('╚══════════════════════════════════════╝', 'win');
+            print('Outstanding work, QA Engineer.', 'win');
+            print('You reproduced the defect AND filed it with the exact wording a developer can act on — no guesswork, no shorthand. That is the standard we hold.', '');
+            print('', '');
+            print('You clearly understand the fundamentals. Ready for your next step?', 'win');
+            link('   →  See where QA can take you:  Careers at Total Onion', 'https://totalonion.com/careers/');
+            print('', '');
+            print('Type  restart  to play again.', 'sys');
+        } else {
+            print('✅  Bug confirmed & filed — solid work, you got there.', 'win');
+            print('But precision is the QA craft: the exact command and repro wording are what let a developer reproduce a bug without guessing. A few of yours were shorthand (partial credit).', '');
+            print('Run it again and aim for a clean, precise 4/4 — that is what unlocks the next step.', 'sys');
+            print('', '');
+            print('Type  restart  to try for a perfect run.', 'sys');
+        }
+    }
+    function reset() {
+        step = 0; done = false; wrong = 0; score = 0; precise = 0; out.innerHTML = '';
+        boot();
+    }
+    function handle(raw) {
+        if (!raw.trim()) return;
+        echo(raw);
+        const n = norm(raw);
+        if (n === 'help')   { help(); return; }
+        if (n === 'clear')  { out.innerHTML = ''; return; }
+        if (n === 'restart'){ reset(); return; }
+        if (done) { print('Scenario complete. Type  restart  to play again.', 'sys'); return; }
+
+        const st = stages[step];
+        const exact = st.full.includes(n);
+        if (exact || st.loose.includes(n)) {
+            wrong = 0;
+            if (st.say[0] === '__WIN__') { win(); return; }
+            if (st.pts > 0) {
+                if (exact) {
+                    score += st.pts; precise++;
+                    print('   +' + st.pts + ' pts — precise wording ✓     (score ' + score + ')', 'win');
+                } else {
+                    const p = Math.round(st.pts * 0.4);
+                    score += p;
+                    print('   +' + p + ' pts — partial credit. Type the FULL command for full marks.     (score ' + score + ')', 'warn');
+                }
+            }
+            st.say.forEach(say);
+            step++;
+        } else {
+            wrong++;
+            if (wrong >= 2) {
+                const reached = Math.min(4, Math.max(0, step - 1));
+                print('✗ Not quite again.', 'err');
+                print('No problem — this is exactly how QA is learned. You worked through ' + reached + ' of 4 steps. Resetting…', 'sys');
+                print('Think it through: read the ticket in full, reproduce one precise step at a time, type the exact command, and always test the edge case. Slow is smooth, smooth is fast.', '');
+                inp.disabled = true;
+                setTimeout(reset, 2400);
+            } else {
+                print('✗ Not quite. Hint: ' + st.hint, 'err');
+            }
+        }
+        screen.scrollTop = screen.scrollHeight;
+    }
+
+    // boot sequence (typed feel)
+    function boot() {
+        const lines = [
+            ['sys', 'TotalOnion QA Terminal  v1.0'],
+            ['sys', 'Booting test environment……  ok'],
+            ['', ''],
+            ['', 'TICKET QA-117'],
+            ['', 'Customers report the discount code SAVE10 can be applied repeatedly,'],
+            ['', 'driving the order total below £0. Your job: reproduce it, then file it.'],
+            ['', ''],
+            ['sys', 'Tip: type the FULL, precise command at each step — precision scores higher.'],
+            ['sys', 'A perfect 4 / 4 unlocks your next step.'],
+            ['', ''],
+            ['sys', 'Type  begin  to accept the ticket.   (help for commands)'],
+        ];
+        let i = 0;
+        inp.disabled = true;
+        (function next() {
+            if (i < lines.length) { say(lines[i]); i++; setTimeout(next, 120); }
+            else { inp.disabled = false; inp.focus(); }
+        })();
+    }
+
+    inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { const v = inp.value; inp.value = ''; handle(v); }
+    });
+    screen.addEventListener('click', () => { if (!inp.disabled) inp.focus(); });
+
+    boot();
     </script>
 </body>
-<iframe width="560" height="315" 
-        src="https://www.youtube.com/embed/nCQro0svp98" 
-        title="YouTube video" 
-        frameborder="0" 
-        allowfullscreen>
+</html>
